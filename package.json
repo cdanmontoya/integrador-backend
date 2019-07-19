@@ -1,0 +1,35 @@
+{
+  "name": "integrador-backend",
+  "version": "1.0.0",
+  "description": "Aplicacion que facilita la gestion de turnos, auxiliares y aulas en la Universidad de Antioquia.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdanmontoya/integrador-backend.git"
+  },
+  "keywords": [
+    "gestion",
+    "aula",
+    "turno",
+    "auxiliar"
+  ],
+  "author": "cdanmontoya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cdanmontoya/integrador-backend/issues"
+  },
+  "homepage": "https://github.com/cdanmontoya/integrador-backend#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.0",
+    "nodemon": "^1.19.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "morgan": "^1.9.1"
+  }
+}
