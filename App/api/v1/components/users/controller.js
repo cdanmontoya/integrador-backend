@@ -1,4 +1,4 @@
-const util = require('./usuario');
+const util = require('./user');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {

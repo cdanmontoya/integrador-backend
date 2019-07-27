@@ -4,8 +4,8 @@ let router = new Router();
 /**
  * References to each resource routers
  */
-let apiv1 = require('./api/v1/route');
+let usuario = require('./components/users/route');
 
-router.use('/api/v1', apiv1);
+router.use('/users', usuario);
 
 module.exports = router;
