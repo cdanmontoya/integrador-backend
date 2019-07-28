@@ -8,13 +8,13 @@ const create = async (req, res) => {
         () => {
             return res
                 .status(httpStatus.CREATED)
-                .send({ message: 'Created.' });
+                .send({ message: 'Created' });
         },
         (err) => {
             console.error(err);
             return res
                 .status(httpStatus.BAD_REQUEST)
-                .send({ message: 'Error.' })
+                .send({ message: 'Error' })
         }
     );
 };
@@ -27,7 +27,7 @@ const get = async (req, res) => {
             if (!data || data.length == 0) {
                 return res
                     .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found.' });
+                    .send({ message: 'Not found' });
             } else {
                 return res
                     .status(httpStatus.OK)
@@ -37,7 +37,7 @@ const get = async (req, res) => {
         (err) => {
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Internal server error.' });
+                .send({ message: 'Internal server error' });
         }
     );
 };
@@ -71,7 +71,7 @@ const update = async (req, res) => {
     await util
         .update(id, body)
         .then((updateResponse) => {
-            // Verifica que sí haya encontrado el registro
+            // Verifica que si haya encontrado el registro
             // ¿Se puede mejorar con una expresión regular?
             updateResponse = updateResponse.replace(/\s/g,'').split(':');
             
@@ -81,7 +81,7 @@ const update = async (req, res) => {
                     .send({ message: 'Not found.' });
             }
 
-            return res.status(httpStatus.OK).send({ message: 'Updated.'});
+            return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
             return res
@@ -99,12 +99,12 @@ const remove = async (req, res) => {
             if (removeResponse == 0) {
                 return res
                     .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found.' });
+                    .send({ message: 'Not found' });
             }
 
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully.'});
+                .send({ message: 'Removed successfully'});
         })
         .catch((err) => {
             console.error(err)
