@@ -2,8 +2,8 @@ const db = require('../../../../../config/database');
 const sequelize = db.sequelize;
 
 const create = async (body) => {
-    const query = `INSERT INTO User (username, email, logistic_unit, user_type) VALUES
-    ('${body.username}', '${body.email}', '${body.logistic_unit}', '${body.user_type}')`;
+    const query = `INSERT INTO User (username, email, logisticUnit, userType) VALUES
+    ('${body.username}', '${body.email}', '${body.logisticUnit}', '${body.userType}')`;
 
     await sequelize.query(query);
 }
@@ -28,34 +28,34 @@ const getAll = async () => {
 
 const update = async (username, body) => {
     const query = `UPDATE User SET username = '${body.username}',
-        email = '${body.email}', logistic_unit = '${body.logistic_unit}', user_type = '${body.user_type}'
+        email = '${body.email}', logisticUnit = '${body.logisticUnit}', userType = '${body.userType}'
         WHERE username = '${username}'`;
 
     let res = await sequelize.query(query);
     return res[0].info;
 }
 
-const remove = async (id) => {
-    const query = `DELETE FROM User WHERE username = '${id}'`;
+const remove = async (username) => {
+    const query = `DELETE FROM User WHERE username = '${username}'`;
 
     let res = await sequelize.query(query);
-    return res[0].affecterRows;
+    return res[0].affectedRows;
 }
 
-const isAdmin = async (id) => {
-    let user = await get(id);
+const isAdmin = async (username) => {
+    let user = await get(username);
     if (!user) {
         return false;
     }
     return user.user_type == 1;
 }
 
-const isAux = async (id) => {
-    let user = await get(id);
+const isAux = async (username) => {
+    let user = await get(username);
     if (!user) {
         return false;
     }
-    return user.user_type == 2;
+    return user.userType == 2;
 }
 
 module.exports = {

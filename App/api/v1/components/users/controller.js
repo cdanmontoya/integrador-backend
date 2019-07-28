@@ -20,9 +20,9 @@ const create = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let id = req.params.id;
+    let username = req.params.username;
 
-    await util.get(id).then(
+    await util.get(username).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -66,10 +66,10 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let id = req.params.id;
+    let username = req.params.username;
 
     await util
-        .update(id, body)
+        .update(username, body)
         .then((updateResponse) => {
             // Verifica que si haya encontrado el registro
             // ¿Se puede mejorar con una expresión regular?
@@ -78,7 +78,7 @@ const update = async (req, res) => {
             if (updateResponse[1].charAt(0) == 0) { 
                 return res
                     .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found.' });
+                    .send({ message: 'Not found' });
             }
 
             return res.status(httpStatus.OK).send({ message: 'Updated'});
@@ -91,10 +91,10 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let id = req.params.id;
+    let username = req.params.username;
 
     await util
-        .remove(id)
+        .remove(username)
         .then((removeResponse) => {
             if (removeResponse == 0) {
                 return res
