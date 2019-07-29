@@ -8,7 +8,7 @@ const cors = require('cors');
 /**
  * Routes to the different resources
  */
-//const routes = require('../app/routes');
+const routes = require('../App/routes');
 
 /**
  * Importing configuration variables
@@ -28,7 +28,7 @@ const server = async (app) => {
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(morgan(morganMode));
     app.use(cors());
-    //app.use('/', routes);
+    app.use('/', routes);
 }
 
 module.exports = server;
