@@ -11,7 +11,7 @@ const create = async (sectionalID, blockID, body) => {
 const createMany = async (sectionalID, blockID, body) => {
     let rooms = body.rooms;
     
-    for (let i = 0; i < numbers.length; i++) {
+    for (let i = 0; i < rooms.length; i++) {
         await create(sectionalID, blockID, rooms[i]);
     }
 }

@@ -9,10 +9,10 @@ const create = async (sectionalID, body) => {
 }
 
 const createMany = async (sectionalID, body) => {
-    let numbers = body.numbers;
+    let blocks = body.numbers;
     
-    for (let i = 0; i < numbers.length; i++) {
-        await create(sectionalID, numbers[i]);
+    for (let i = 0; i < blocks.length; i++) {
+        await create(sectionalID, blocks[i]);
     }
 }
 
