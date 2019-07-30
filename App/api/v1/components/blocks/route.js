@@ -10,12 +10,12 @@ router.route('/')
 router.route('/many')
     .post((req, res) => controller.createMany(req, res));
 
-router.route('/:blockNumber')
+router.route('/:blockID')
     .get((req, res) => controller.get(req, res))
     .put((req, res) => controller.update(req, res))
     .delete((req, res) => controller.remove(req, res));
 
 const rooms = require('../rooms/route');
-router.use('/:blockNumber/rooms', rooms);
+router.use('/:blockID/rooms', rooms);
 
 module.exports = router;

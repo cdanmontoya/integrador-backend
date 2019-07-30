@@ -10,7 +10,7 @@ router.route('/')
 router.route('/many')
     .post((req, res) => controller.createMany(req, res));
 
-router.route('/:roomNumber')
+router.route('/:roomID')
     .get((req, res) => controller.get(req, res))
     .put((req, res) => controller.update(req, res))
     .delete((req, res) => controller.remove(req, res));

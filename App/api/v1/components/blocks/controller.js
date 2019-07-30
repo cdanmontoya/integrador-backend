@@ -2,7 +2,7 @@ const util = require('./block');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
-    let sectional = req.params.sectional; 
+    let sectional = req.params.sectionalID; 
     let body = req.body;
 
     await util.create(sectional, body).then(
@@ -21,7 +21,7 @@ const create = async (req, res) => {
 };
 
 const createMany = async (req, res) => {
-    let sectional = req.params.sectional; 
+    let sectional = req.params.sectionalID; 
     let body = req.body;
 
     await util.createMany(sectional, body).then(
@@ -40,8 +40,8 @@ const createMany = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
 
     await util.get(sectional, number).then(
         (data) => {
@@ -64,7 +64,7 @@ const get = async (req, res) => {
 };
 
 const getBySectional = async (req, res) => {
-    let sectional = req.params.sectional;
+    let sectional = req.params.sectionalID;
 
     await util.getBySectional(sectional).then(
         (data) => {
@@ -87,8 +87,8 @@ const getBySectional = async (req, res) => {
 };
 
 const getRooms = async (req, res) => {
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
 
     await util.getRooms(sectional, number).then(
         (data) => {
@@ -134,8 +134,8 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
 
     await util
         .update(sectional, number, body)
@@ -160,8 +160,8 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
 
     await util
         .remove(sectional, number)

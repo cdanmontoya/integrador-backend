@@ -2,8 +2,8 @@ const util = require('./room');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
-    let sectional = req.params.sectional; 
-    let block = req.params.blockNumber;
+    let sectional = req.params.sectionalID; 
+    let block = req.params.blockID;
     let body = req.body;
 
     await util.create(sectional, block, body).then(
@@ -22,8 +22,8 @@ const create = async (req, res) => {
 };
 
 const createMany = async (req, res) => {
-    let sectional = req.params.sectional; 
-    let block = req.params.blockNumber;
+    let sectional = req.params.sectionalID; 
+    let block = req.params.blockID;
 
     let body = req.body;
 
@@ -43,9 +43,9 @@ const createMany = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
-    let id = req.params.roomNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
+    let id = req.params.roomID;
 
     await util.get(sectional, number, id).then(
         (data) => {
@@ -68,8 +68,8 @@ const get = async (req, res) => {
 };
 
 const getByBlock = async (req, res) => {
-    let sectional = req.params.sectional;
-    let block = req.params.blockNumber;
+    let sectional = req.params.sectionalID;
+    let block = req.params.blockID;
 
     await util.getByBlock(sectional, block).then(
         (data) => {
@@ -115,9 +115,9 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
-    let id = req.params.roomNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
+    let id = req.params.roomID;
 
     await util
         .update(sectional, number, id, body)
@@ -142,9 +142,9 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let sectional = req.params.sectional;
-    let number = req.params.blockNumber;
-    let id = req.params.roomNumber;
+    let sectional = req.params.sectionalID;
+    let number = req.params.blockID;
+    let id = req.params.roomID;
 
     await util
         .remove(sectional, number, id)

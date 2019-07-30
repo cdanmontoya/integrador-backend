@@ -20,7 +20,7 @@ const create = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let id = req.params.sectional;
+    let id = req.params.sectionalID;
 
     await util.get(id).then(
         (data) => {
