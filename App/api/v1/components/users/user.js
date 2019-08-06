@@ -1,6 +1,8 @@
 const db = require('../../../../../config/database');
 const sequelize = db.sequelize;
 
+const config = require('./config');
+
 const create = async (body) => {
     const query = `INSERT INTO User (username, email, logisticUnit, userType) VALUES
     ('${body.username}', '${body.email}', '${body.logisticUnit}', '${body.userType}')`;
@@ -47,15 +49,15 @@ const isAdmin = async (username) => {
     if (!user) {
         return false;
     }
-    return user.user_type == 1;
+    return user.user_type == config.ADMIN;
 }
 
-const isAux = async (username) => {
+const isAssistant = async (username) => {
     let user = await get(username);
     if (!user) {
         return false;
     }
-    return user.userType == 2;
+    return user.userType == config.ASSISTANT;
 }
 
 module.exports = {
@@ -65,5 +67,5 @@ module.exports = {
     update,
     remove,
     isAdmin,
-    isAux
+    isAssistant
 }
