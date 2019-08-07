@@ -5,18 +5,14 @@ const controller = require('./controller');
 
 router.route('/')
     .post((req, res) => controller.create(req, res))
-    .get((req, res) => controller.getByBlock(req, res));
+    .get((req, res) => controller.getByRoom(req, res));
 
-router.route('/many')
-    .post((req, res) => controller.createMany(req, res));
-
-router.route('/:roomID')
+router.route('/:eventID')
     .get((req, res) => controller.get(req, res))
     .put((req, res) => controller.update(req, res))
     .delete((req, res) => controller.remove(req, res));
 
-const events = require('../events/route');
-
-router.use('/:roomID/events', events);
+router.route('/:eventID/changestate')
+    .put((req, res) => controller.changeState(req, res));
 
 module.exports = router;
