@@ -16,7 +16,7 @@ const get = async (username) => {
     let data = await sequelize.query(query);
     data = JSON.parse(JSON.stringify(data[0]));
 
-    return data;
+    return data[0];
 }
 
 const getAll = async () => {
