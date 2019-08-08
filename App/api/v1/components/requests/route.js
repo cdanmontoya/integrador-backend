@@ -15,7 +15,6 @@ router.route('/:requestID')
 router.route('/:requestID/changestate')
     .put((req, res) => controller.changeState(req, res));
 
-
 const items = require('../items-per-request/route');
 
 router.use('/:requestID/items', items);
