@@ -2,6 +2,18 @@ const db = require('../../../../../config/database');
 const sequelize = db.sequelize;
 
 const create = async (params, body) => {
+    let unsupervisedRooms = await getUnsupervisedRooms();
+
+    let isAvailable = unsupervisedRooms.find( element => {
+        if (element.sectionalID == body.sectionalID && element.blockID == body.blockID && element.roomID == body.roomID){
+            return element;
+        }
+    }) 
+
+    if (!isAvailable) {
+        throw "Error: room is already supervised or does not exist";
+    }
+
     let logisticUnit = params.username;
 
     const query = `INSERT INTO Rooms_per_Logistic_unit (logisticUnit, sectionalID, blockID, roomID) VALUES
