@@ -10,14 +10,13 @@ const create = async (requestID, body) => {
 }
 
 const createMany = async (requestID, items) => {
-    
     for (let i = 0; i < items.length; i++) {
         await create(requestID, items[i]);
     }
 }
 
 const get = async (params) => {
-    const query = `SELECT * FROM Items_per_request WHERE requestID = '${params.requestID}'`;
+    const query = `SELECT * FROM Items_per_request WHERE requestID = '${params.requestID}' AND itemType = '${params.itemType}'`;
 
     let data = await sequelize.query(query);
     data = JSON.parse(JSON.stringify(data[0]));
@@ -25,14 +24,14 @@ const get = async (params) => {
     return data[0];
 }
 
-// const getByBlock = async (sectional, block) => {
-//     const query = `SELECT * FROM Room WHERE sectionalID = '${sectional}' AND blockID = '${block}'`;
+const getByRequest = async (params) => {
+    const query = `SELECT * FROM Items_per_request WHERE requestID = '${params.requestID}'`;
 
-//     let data = await sequelize.query(query);
-//     data = JSON.parse(JSON.stringify(data[0]));
+    let data = await sequelize.query(query);
+    data = JSON.parse(JSON.stringify(data[0]));
 
-//     return data;
-// }
+    return data;
+}
 
 const getAll = async () => {
     const query = `SELECT * FROM Items_per_room`;
@@ -42,20 +41,6 @@ const getAll = async () => {
 
     return data;
 }
-
-// const update = async (sectional, block, id, body) => {
-//     !body.sectionalID ? sectional : body.sectional;
-//     if (!body.sectionalID) {
-//         body.sectionalID = sectional
-//     } 
-
-//     const query = `UPDATE Room SET id = '${body.id}',
-//         sectionalID = '${body.sectionalID}', capacity = '${body.capacity}', type = '${body.type}'
-//         WHERE sectionalID = '${sectional}'  AND blockID = '${block}' AND id = '${id}'`;
-
-//     let res = await sequelize.query(query);
-//     return res[0].info;
-// }
 
 const remove = async (params) => {
     const query = `DELETE FROM Items_per_room WHERE requestID = '${params.requestID}' AND itemType = '${paras.itemType}'`;
@@ -68,6 +53,7 @@ module.exports = {
     create,
     createMany,
     get,
+    getByRequest,
     getAll,
     remove,
 }

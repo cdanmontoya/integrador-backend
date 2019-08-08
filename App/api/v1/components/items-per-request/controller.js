@@ -22,12 +22,10 @@ const create = async (req, res) => {
 };
 
 const createMany = async (req, res) => {
-    let sectional = req.params.sectionalID; 
-    let block = req.params.blockID;
-
+    let sectional = req.params.requestID; 
     let body = req.body;
 
-    await util.createMany(sectional, block, body).then(
+    await util.createMany(sectional, body).then(
         () => {
             return res
                 .status(httpStatus.CREATED)
@@ -58,6 +56,7 @@ const get = async (req, res) => {
             }
         },
         (err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
@@ -65,15 +64,15 @@ const get = async (req, res) => {
     );
 };
 
-const getByRoom = async (req, res) => {
+const getByRequest = async (req, res) => {
     let params = req.params;
 
-    await util.getByRoom(params).then(
+    await util.getByRequest(params).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
-                    .status(httpStatus.NO_CONTENT)
-                    .send({ message: 'No content' });
+                    .status(httpStatus.NOT_FOUND)
+                    .send({ message: 'Not found' });
             } else {
                 return res
                     .status(httpStatus.OK)
@@ -110,34 +109,6 @@ const getAll = async (req, res) => {
     );
 };
 
-// const update = async (req, res) => {
-//     let body = req.body;
-//     let sectional = req.params.sectional;
-//     let number = req.params.blockNumber;
-//     let id = req.params.roomNumber;
-
-//     await util
-//         .update(sectional, number, id, body)
-//         .then((updateResponse) => {
-//             // Verifica que si haya encontrado el registro
-//             // ¿Se puede mejorar con una expresión regular?
-//             updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-//             if (updateResponse[1].charAt(0) == 0) { 
-//                 return res
-//                     .status(httpStatus.NOT_FOUND)
-//                     .send({ message: 'Not found' });
-//             }
-
-//             return res.status(httpStatus.OK).send({ message: 'Updated'});
-//         })
-//         .catch((err) => {
-//             return res
-//                 .status(httpStatus.INTERNAL_SERVER_ERROR)
-//                 .send({ message: 'Error' });
-//         });
-// };
-
 const remove = async (req, res) => {
     let id = req.params.itemID;
 
@@ -166,7 +137,7 @@ module.exports = {
     create,
     createMany,
     get,
-    getByRoom,
+    getByRequest,
     getAll,
     remove
 }
