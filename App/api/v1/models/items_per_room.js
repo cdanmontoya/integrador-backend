@@ -41,6 +41,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   }, {
-    tableName: 'items_per_room'
+    tableName: 'items_per_room',
+    timestamps: false
   });
 };

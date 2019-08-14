@@ -33,6 +33,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     }
   }, {
-    tableName: 'event_record'
+    tableName: 'event_record',
+    timestamps: false
   });
 };

@@ -16,9 +16,10 @@ const create = async (body) => {
 }
 
 const get = async (username) => {
-    return User.findAll({
-        where: {  username }
+    let data = await User.findAll({
+        where: { username }
     });
+    return data[0];
 }
 
 const getAll = async () => {
@@ -36,7 +37,7 @@ const update = async (query_username, body) => {
 
 const remove = async (username) => {
     User.destroy({
-        where: {username}
+        where: { username }
     });
 }
 

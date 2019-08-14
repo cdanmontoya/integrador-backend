@@ -1,53 +1,53 @@
 const db = require('../../../../../config/database');
 const sequelize = db.sequelize;
 
-const create = async (body) => {
-    const query = `INSERT INTO Sectional (id, name, address, phoneNumber) VALUES
-    ('${body.id}','${body.name}', '${body.address}', '${body.phoneNumber}')`;
+let Sectional = require('../../models/sectional');
+Sectional = Sectional(db.sequelize, db.Sequelize);
 
-    await sequelize.query(query);
+const create = async (body) => {
+    let { id, name, address, phoneNumber } = body;
+
+    Sectional.create({
+        id,
+        name,
+        address,
+        phoneNumber
+    });
 }
 
 const get = async (id) => {
-    const query = `SELECT * FROM Sectional WHERE Sectional.id = '${id}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
+    let data = await Sectional.findAll({
+        where: { id }
+    });
     return data[0];
 }
 
 const getAll = async () => {
-    const query = `SELECT * FROM Sectional`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    return Sectional.findAll();
 }
 
-const update = async (id, body) => {
-    const query = `UPDATE Sectional SET name = '${body.name}', address = '${body.address}', phoneNumber = '${body.phoneNumber}'
-        WHERE id = '${id}'`;
+const update = async (query_id, body) => {
+    let { id, name, address, phoneNumber } = body;
 
-    let res = await sequelize.query(query);
-    return res[0].info;
+    Sectional.update(
+        { id, name, address, phoneNumber },
+        { where: { id: query_id } }
+    );
 }
 
 const remove = async (id) => {
-    const query = `DELETE FROM Sectional WHERE id = '${id}'`;
-
-    let res = await sequelize.query(query);
-    return res[0].affectedRows;
+    Sectional.destroy({
+        where: id
+    });
 }
 
 const getBlocks = async (id) => {
-    const query = `SELECT * FROM Block WHERE sectionalID = '${id}'`;
+    let Blocks = require('../../models/block');
+    Blocks = Blocks(db.sequelize, db.Sequelize);
 
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    return Blocks.getAll({
+        where: {sectionalID: id}
+    });
 }
 
 
