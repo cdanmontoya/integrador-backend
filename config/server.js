@@ -4,11 +4,14 @@
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 /**
  * Routes to the different resources
  */
 const routes = require('../App/routes');
+const swaggerV1 = YAML.load(__dirname + '/swagger/v1.yaml');
 
 /**
  * Importing configuration variables
@@ -29,6 +32,7 @@ const server = async (app) => {
     app.use(morgan(morganMode));
     app.use(cors());
     app.use('/', routes);
+    app.use('/api-docs/v1', swaggerUi.serve, swaggerUi.setup(swaggerV1));
 }
 
 module.exports = server;

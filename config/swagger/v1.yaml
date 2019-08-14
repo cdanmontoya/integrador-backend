@@ -1,0 +1,70 @@
+swagger: "2.0"
+info:
+  description: "Backend endpoints specifiaction"
+  version: "1.0.0"
+  title: "App documentation"
+  license:
+    name: "MIT"
+host: "localhost:8080"
+basePath: "/api/v1"
+tags:
+- name: "Blocks"
+  description: "Set of services related to blocks"
+schemes:
+- "http"
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: authorization
+    in: header
+paths:
+  /sectional/{sectionalID}/blocks:
+    post:
+      security:
+      - Bearer: []
+      tags:
+      - "Blocks"
+      summary: "Creates a new block related to a sectional."
+      description: ""
+      consumes: 
+      - "application/json"
+      produces: 
+      - "application/json"
+      parameters: 
+      - in: "path"
+        name: "sectionalID"
+        description: "Sectional to which a block belongs"
+        required: true
+      - in: "body"
+        name: "id"
+        description: "Number which will identify a block in a sectional"
+        required: true
+        schema:
+          $ref: "#/definitions/Blocks"
+      responses:
+        201:
+          description: "Created"
+          schema:
+            type: "object"
+            properties:
+                message: 
+                  type: "string"
+    
+  
+definitions:
+  Blocks:
+    type: "object"
+    required:
+    - "sectionalID"
+    - "id"
+    properties:
+      id:
+        type: "string"
+        description: "Block identifier"
+      sectionalID:
+        type: "string"
+        description: "Sectional identifier"
+      
+    xml:
+      name: "Committee"
+  
