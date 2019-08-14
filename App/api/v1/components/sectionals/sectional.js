@@ -1,5 +1,4 @@
 const db = require('../../../../../config/database');
-const sequelize = db.sequelize;
 
 let Sectional = require('../../models/sectional');
 Sectional = Sectional(db.sequelize, db.Sequelize);
@@ -37,7 +36,7 @@ const update = async (query_id, body) => {
 
 const remove = async (id) => {
     Sectional.destroy({
-        where: id
+        where: { id }
     });
 }
 
@@ -46,11 +45,9 @@ const getBlocks = async (id) => {
     Blocks = Blocks(db.sequelize, db.Sequelize);
 
     return Blocks.getAll({
-        where: {sectionalID: id}
+        where: { sectionalID: id }
     });
 }
-
-
 
 module.exports = {
     create,

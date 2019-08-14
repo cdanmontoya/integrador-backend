@@ -1,70 +1,72 @@
 const db = require('../../../../../config/database');
-const sequelize = db.sequelize;
+let Block = require('../../models/block');
+Block = Block(db.sequelize, db.Sequelize);
 
 const create = async (sectionalID, body) => {
-    const query = `INSERT INTO Block (number, sectionalID) VALUES
-    ('${body.number}','${sectionalID}')`;
+    let { number } = body;
 
-    await sequelize.query(query);
+    Block.create({
+        number,
+        sectionalID
+    });
 }
 
 const createMany = async (sectionalID, body) => {
     let blocks = body.numbers;
-    
+
     for (let i = 0; i < blocks.length; i++) {
         await create(sectionalID, blocks[i]);
     }
 }
 
-const get = async (sectional, number) => {
-    const query = `SELECT * FROM Block WHERE sectionalID = '${sectional}' AND number = '${number}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
+const get = async (sectionalID, number) => {
+    let data = await Block.findAll({
+        where: {
+            sectionalID,
+            number
+        }
+    });
     return data[0];
 }
 
-const getBySectional = async (sectional) => {
-    const query = `SELECT * FROM Block WHERE sectionalID = '${sectional}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+const getBySectional = async (sectionalID) => {
+    return Block.findAll({
+        where: { sectionalID }
+    });
 }
 
 const getAll = async () => {
-    const query = `SELECT * FROM Block`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    return Block.findAll();
 }
 
-const update = async (sectional, number, body) => {
-    const query = `UPDATE Block SET number = '${body.number}',
-        sectionalID = '${body.sectionalID}' WHERE sectionalID = '${sectional}' AND number = '${number}'`;
+const update = async (query_sectional, query_block, body) => {
+    let { number, sectionalID } = body;
 
-    let res = await sequelize.query(query);
-    return res[0].info;
+    Block.update(
+        { number, sectionalID },
+        { where: {
+            sectionalID: query_sectional,
+            number: query_block
+        }}
+    );
 }
 
-const remove = async (sectional, number) => {
-    const query = `DELETE FROM Block WHERE sectionalID = '${sectional}' AND number = '${number}'`;
-
-    let res = await sequelize.query(query);
-    return res[0].affectedRows;
+const remove = async (sectionalID, number) => {
+    Block.destroy({
+        where: { sectionalID, number }
+    });
 }
 
-const getRooms = async (sectional, number) => {
-    const query = `SELECT * FROM Room WHERE WHERE sectionalID = '${sectional}' AND blockID = '${number}'`;
+const getRooms = async (sectionalID, blockID) => {
+    let Room = require('../../models/room');
+    Room = Room(db.sequelize, db.Sequelize);
 
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    Room.findAll({
+        where: {
+            sectionalID,
+            blockID
+        }
+    });
 }
 
 
