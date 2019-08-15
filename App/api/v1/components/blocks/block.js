@@ -69,8 +69,6 @@ const getRooms = async (sectionalID, blockID) => {
     });
 }
 
-
-
 module.exports = {
     create,
     createMany,
