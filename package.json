@@ -25,6 +25,7 @@
   "homepage": "https://github.com/cdanmontoya/integrador-backend#readme",
   "devDependencies": {
     "@types/express": "^4.17.0",
+    "@types/sequelize": "^4.28.4",
     "nodemon": "^1.19.1"
   },
   "dependencies": {

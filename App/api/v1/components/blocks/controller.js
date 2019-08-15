@@ -2,7 +2,7 @@ const util = require('./block');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
-    let sectional = req.params.sectionalID; 
+    let sectional = req.params.sectionalID;
     let body = req.body;
 
     await util.create(sectional, body).then(
@@ -21,7 +21,7 @@ const create = async (req, res) => {
 };
 
 const createMany = async (req, res) => {
-    let sectional = req.params.sectionalID; 
+    let sectional = req.params.sectionalID;
     let body = req.body;
 
     await util.createMany(sectional, body).then(
@@ -56,6 +56,7 @@ const get = async (req, res) => {
             }
         },
         (err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
@@ -139,18 +140,8 @@ const update = async (req, res) => {
 
     await util
         .update(sectional, number, body)
-        .then((updateResponse) => {
-            // Verifica que si haya encontrado el registro
-            // ¿Se puede mejorar con una expresión regular?
-            updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-            if (updateResponse[1].charAt(0) == 0) { 
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
-            return res.status(httpStatus.OK).send({ message: 'Updated'});
+        .then(() => {
+            return res.status(httpStatus.OK).send({ message: 'Updated' });
         })
         .catch((err) => {
             return res
@@ -174,7 +165,7 @@ const remove = async (req, res) => {
 
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully'});
+                .send({ message: 'Removed successfully' });
         })
         .catch((err) => {
             console.error(err)
