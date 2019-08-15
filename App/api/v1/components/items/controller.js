@@ -1,4 +1,4 @@
-const util = require('./user');
+const util = require('./item');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
@@ -20,9 +20,9 @@ const create = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let username = req.params.username;
+    let itemID = req.params.itemID;
 
-    await util.get(username).then(
+    await util.get(itemID).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -35,7 +35,6 @@ const get = async (req, res) => {
             }
         },
         (err) => {
-            console.error(err);
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
@@ -67,17 +66,15 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let username = req.params.username;
-
-    let user = await util.get(username);
-    if (!user) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+    let itemID = req.params.itemID;
 
     await util
-        .update(username, body)
+        .update(itemID, body)
         .then(() => {
             return res.status(httpStatus.OK).send({ message: 'Updated' });
         })
         .catch((err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Error' });
@@ -85,14 +82,17 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let username = req.params.username;
-
-    let user = await util.get(username);
-    if (!user) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+    let itemID = req.params.itemID;
 
     await util
-        .remove(username)
-        .then(() => {
+        .remove(itemID)
+        .then((removeResponse) => {
+            if (removeResponse == 0) {
+                return res
+                    .status(httpStatus.NOT_FOUND)
+                    .send({ message: 'Not found' });
+            }
+
             return res
                 .status(httpStatus.OK)
                 .send({ message: 'Removed successfully' });
@@ -105,10 +105,38 @@ const remove = async (req, res) => {
         });
 };
 
+const changeState = async (req, res) => {
+    let params = req.params;
+    let body = req.body;
+
+    await util
+        .changeState(params, body)
+        .then((updateResponse) => {
+            // Verifica que si haya encontrado el registro
+            // ¿Se puede mejorar con una expresión regular?
+            updateResponse = updateResponse.replace(/\s/g, '').split(':');
+
+            if (updateResponse[1].charAt(0) == 0) {
+                return res
+                    .status(httpStatus.NOT_FOUND)
+                    .send({ message: 'Not found' });
+            }
+
+            return res.status(httpStatus.OK).send({ message: 'Updated' });
+        })
+        .catch((err) => {
+            console.log(err)
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Error', err });
+        });
+}
+
 module.exports = {
     create,
     get,
     getAll,
     update,
-    remove
+    remove,
+    changeState
 }

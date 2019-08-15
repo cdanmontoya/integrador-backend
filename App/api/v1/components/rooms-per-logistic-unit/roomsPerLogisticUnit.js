@@ -1,68 +1,60 @@
 const db = require('../../../../../config/database');
-const sequelize = db.sequelize;
+let RoomsPerLogisticUnit = require('../../models/rooms_per_logistic_unit');
+RoomsPerLogisticUnit = RoomsPerLogisticUnit(db.sequelize, db.Sequelize);
 
 const create = async (params, body) => {
     let unsupervisedRooms = await getUnsupervisedRooms();
 
-    let isAvailable = unsupervisedRooms.find( element => {
-        if (element.sectionalID == body.sectionalID && element.blockID == body.blockID && element.roomID == body.roomID){
+    let isAvailable = unsupervisedRooms.find(element => {
+        if (element.sectionalID == body.sectionalID && element.blockID == body.blockID && element.roomID == body.roomID) {
             return element;
         }
-    }) 
+    })
 
     if (!isAvailable) {
         throw "Error: room is already supervised or does not exist";
     }
 
     let logisticUnit = params.username;
+    let { sectionalID, blockID, roomID } = body;
 
-    const query = `INSERT INTO Rooms_per_Logistic_unit (logisticUnit, sectionalID, blockID, roomID) VALUES
-    ('${logisticUnit}', '${body.sectionalID}', '${body.blockID}', '${body.roomID}')`;
-
-    await sequelize.query(query);
+    RoomsPerLogisticUnit.create({
+        logisticUnit, sectionalID, blockID, roomID
+    });
 }
 
 const get = async (id) => {
-    const query = `SELECT * FROM Rooms_per_Logistic_unit WHERE id = '${id}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
+    let data = await RoomsPerLogisticUnit.findAll({
+        where: { id }
+    });
     return data[0];
 }
 
 const getUnsupervisedRooms = async () => {
-    const query = `select room.id as roomID, room.blockID, room.sectionalID, room.capacity, room.type from room left join rooms_per_logistic_unit as rplu on room.sectionalID = rplu.sectionalID and room.blockID = rplu.blockID and room.id = rplu.roomID where rplu.id IS NULL;`;
+    const query = `SELECT room.id AS roomID, room.blockID, room.sectionalID, room.capacity, room.type 
+        FROM room LEFT JOIN rooms_per_logistic_unit AS rplu ON room.sectionalID = rplu.sectionalID AND room.blockID = rplu.blockID AND room.id = rplu.roomID 
+        WHERE rplu.id IS NULL;`;
 
-    let data = await sequelize.query(query);
+    let data = await db.sequelize.query(query);
     data = JSON.parse(JSON.stringify(data[0]));
 
     return data;
 }
 
 const getByLogisticUnit = async (logisticUnit) => {
-    const query = `SELECT * FROM Rooms_per_Logistic_Unit WHERE logisticUnit = '${logisticUnit}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    return RoomsPerLogisticUnit.findAll({
+        where: { logisticUnit }
+    });
 }
 
 const getAll = async () => {
-    const query = `SELECT * FROM Rooms_per_Logistic_unit`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-    
-    return data;
+    return RoomsPerLogisticUnit.findAll();
 }
 
 const remove = async (id) => {
-    const query = `DELETE FROM Rooms_per_Logistic_unit WHERE id = '${id}'`;
-
-    let res = await sequelize.query(query);
-    return res[0].affectedRows;
+    RoomsPerLogisticUnit.destroy({
+        where: { id }
+    });
 }
 
 

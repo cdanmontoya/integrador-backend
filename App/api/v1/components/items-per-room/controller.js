@@ -1,10 +1,31 @@
-const util = require('./user');
+const util = require('./itemsPerRoom');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
     let body = req.body;
 
-    await util.create(body).then(
+    await util.create(req.params, body).then(
+        () => {
+            return res
+                .status(httpStatus.CREATED)
+                .send({ message: 'Created' });
+        },
+        (err) => {
+            console.error(err);
+            return res
+                .status(httpStatus.BAD_REQUEST)
+                .send({ message: 'Error' })
+        }
+    );
+};
+
+const createMany = async (req, res) => {
+    let sectional = req.params.sectionalID; 
+    let block = req.params.blockID;
+
+    let body = req.body;
+
+    await util.createMany(sectional, block, body).then(
         () => {
             return res
                 .status(httpStatus.CREATED)
@@ -20,9 +41,9 @@ const create = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let username = req.params.username;
+    let id = req.params.itemPerRoomID;
 
-    await util.get(username).then(
+    await util.get(id).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -35,7 +56,30 @@ const get = async (req, res) => {
             }
         },
         (err) => {
-            console.error(err);
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Internal server error' });
+        }
+    );
+};
+
+const getByRoom = async (req, res) => {
+    let params = req.params;
+
+    await util.getByRoom(params).then(
+        (data) => {
+            if (!data || data.length == 0) {
+                return res
+                    .status(httpStatus.NO_CONTENT)
+                    .send({ message: 'No content' });
+            } else {
+                return res
+                    .status(httpStatus.OK)
+                    .send(data);
+            }
+        },
+        (err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
@@ -67,15 +111,19 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let username = req.params.username;
+    let id = req.params.itemPerRoomID;
 
-    let user = await util.get(username);
-    if (!user) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+    let ipr = await util.get(id);
+    if (!ipr) {
+        return res
+        .status(httpStatus.NOT_FOUND)
+        .send({ message: 'Not found' });
+    }
 
     await util
-        .update(username, body)
+        .update(id, body)
         .then(() => {
-            return res.status(httpStatus.OK).send({ message: 'Updated' });
+            return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
             return res
@@ -85,17 +133,22 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let username = req.params.username;
+    let id = req.params.itemPerRoomID;
 
-    let user = await util.get(username);
-    if (!user) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+    let ipr = await util.get(id);
+    if (!ipr) {
+        return res
+        .status(httpStatus.NOT_FOUND)
+        .send({ message: 'Not found' });
+    }
+
 
     await util
-        .remove(username)
+        .remove(id)
         .then(() => {
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully' });
+                .send({ message: 'Removed successfully'});
         })
         .catch((err) => {
             console.error(err)
@@ -107,6 +160,8 @@ const remove = async (req, res) => {
 
 module.exports = {
     create,
+    createMany,
+    getByRoom,
     get,
     getAll,
     update,

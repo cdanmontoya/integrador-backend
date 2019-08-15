@@ -3,8 +3,9 @@ const httpStatus = require('http-status');
 
 const create = async (req, res) => {
     let body = req.body;
+    let params = req.params;
 
-    await util.create(body).then(
+    await util.create(params, body).then(
         () => {
             return res
                 .status(httpStatus.CREATED)
@@ -14,7 +15,7 @@ const create = async (req, res) => {
             console.error(err);
             return res
                 .status(httpStatus.BAD_REQUEST)
-                .send({ message: 'Error' })
+                .send({ message: err })
         }
     );
 };
@@ -110,20 +111,21 @@ const getAll = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let requestID = req.params.itemID;
+    let rpluID = req.params.rpluID;
+
+    let rplu = await util.get(rpluID);
+    if (!rplu) {
+        return res
+            .status(httpStatus.NOT_FOUND)
+            .send({ message: 'Not found' });
+    }
 
     await util
         .remove(requestID)
-        .then((removeResponse) => {
-            if (removeResponse == 0) {
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
+        .then(() => {
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully'});
+                .send({ message: 'Removed successfully' });
         })
         .catch((err) => {
             console.error(err)
