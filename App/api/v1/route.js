@@ -14,4 +14,10 @@ router.use('/sectionals', sectional);
 router.use('/items', items);
 router.use('/events', events);
 
+let roomsController = require('./components/rooms/controller')
+
+router.route('/rooms').post((req, res) => {
+    roomsController.getAvailableRooms(req, res)
+})
+
 module.exports = router;

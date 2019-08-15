@@ -40,6 +40,23 @@ const getAll = async () => {
     return Room.findAll();
 }
 
+const getAvailableRooms = async (startTime, endTime) => {
+    console.log(startTime);
+
+    startTime = new Date(startTime);
+    endTime = new Date(endTime);
+    
+    const query = `select jeje.id as roomID, jeje.blockID, jeje.sectionalID, jeje.capacity, jeje.type  
+        from room as jeje left join 
+        (select r.id, r.blockID, r.sectionalID from event as e inner join room as r on r.id = e.roomID and r.blockID = e.blockID and r.sectionalID = e.sectionalID where (e.startTime between '${startTime}' and '${endTime}')  or (e.endTime between '${startTime}' and '${endTime}')) as result
+        on jeje.id = result.id and jeje.blockID = result.blockID and result.sectionalID = jeje.sectionalID where result.id is null;`
+
+    let data = await db.sequelize.query(query);
+    data = JSON.parse(JSON.stringify(data[0]));
+
+    return data;
+}
+
 const update = async (query_sectionalID, query_block, query_id, body) => {
     let { sectionalID, blockID, id, capacity, type } = body;
 
@@ -66,6 +83,7 @@ module.exports = {
     createMany,
     get,
     getByBlock,
+    getAvailableRooms,
     getAll,
     update,
     remove,

@@ -91,6 +91,31 @@ const getByBlock = async (req, res) => {
     );
 };
 
+const getAvailableRooms = async (req, res) => {
+    let startTime = req.body.startTime;
+    let endTime = req.body.endTime;
+
+    await util.getAvailableRooms(startTime, endTime).then(
+        (data) => {
+            if (data.length > 0) {
+                return res
+                    .status(httpStatus.OK)
+                    .send(data);
+            } else {
+                return res
+                    .status(httpStatus.NO_CONTENT)
+                    .send({ message: 'No data found' });
+            }
+        },
+        (err) => {
+            console.error(err);
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Error' });
+        }
+    );
+}
+
 const getAll = async (req, res) => {
     await util.getAll().then(
         (data) => {
@@ -162,6 +187,7 @@ module.exports = {
     createMany,
     get,
     getByBlock,
+    getAvailableRooms,
     getAll,
     update,
     remove
