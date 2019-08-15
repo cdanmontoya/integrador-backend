@@ -66,21 +66,14 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let id = req.params.id;
+    let id = req.params.sectionalID;
+
+    let sectional = await util.get(id);
+    if (!sectional) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
 
     await util
         .update(id, body)
-        .then((updateResponse) => {
-            // Verifica que si haya encontrado el registro
-            // ¿Se puede mejorar con una expresión regular?
-            updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-            if (updateResponse[1].charAt(0) == 0) { 
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
+        .then(() => {
             return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
@@ -91,17 +84,14 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-    let id = req.params.id;
+    let id = req.params.sectionalID;
+
+    let sectional = await util.get(id);
+    if (!sectional) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
 
     await util
         .remove(id)
-        .then((removeResponse) => {
-            if (removeResponse == 0) {
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
+        .then(() => {
             return res
                 .status(httpStatus.OK)
                 .send({ message: 'Removed successfully'});
@@ -115,7 +105,7 @@ const remove = async (req, res) => {
 };
 
 const getBlocks = async (req, res) => {
-    let id = req.params.id;
+    let id = req.params.sectionalID;
 
     await util.getBlocks(id).then(
         (data) => {
