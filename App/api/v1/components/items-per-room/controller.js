@@ -2,11 +2,9 @@ const util = require('./itemsPerRoom');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
-    let sectional = req.params.sectional; 
-    let block = req.params.blockNumber;
     let body = req.body;
 
-    await util.create(sectional, block, body).then(
+    await util.create(req.params, body).then(
         () => {
             return res
                 .status(httpStatus.CREATED)
@@ -22,8 +20,8 @@ const create = async (req, res) => {
 };
 
 const createMany = async (req, res) => {
-    let sectional = req.params.sectional; 
-    let block = req.params.blockNumber;
+    let sectional = req.params.sectionalID; 
+    let block = req.params.blockID;
 
     let body = req.body;
 
@@ -43,9 +41,9 @@ const createMany = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let params = req.params;
+    let id = req.params.itemPerRoomID;
 
-    await util.get(params).then(
+    await util.get(id).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -81,6 +79,7 @@ const getByRoom = async (req, res) => {
             }
         },
         (err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
@@ -110,46 +109,43 @@ const getAll = async (req, res) => {
     );
 };
 
-// const update = async (req, res) => {
-//     let body = req.body;
-//     let sectional = req.params.sectional;
-//     let number = req.params.blockNumber;
-//     let id = req.params.roomNumber;
+const update = async (req, res) => {
+    let body = req.body;
+    let id = req.params.itemPerRoomID;
 
-//     await util
-//         .update(sectional, number, id, body)
-//         .then((updateResponse) => {
-//             // Verifica que si haya encontrado el registro
-//             // ¿Se puede mejorar con una expresión regular?
-//             updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-//             if (updateResponse[1].charAt(0) == 0) { 
-//                 return res
-//                     .status(httpStatus.NOT_FOUND)
-//                     .send({ message: 'Not found' });
-//             }
+    let ipr = await util.get(id);
+    if (!ipr) {
+        return res
+        .status(httpStatus.NOT_FOUND)
+        .send({ message: 'Not found' });
+    }
 
-//             return res.status(httpStatus.OK).send({ message: 'Updated'});
-//         })
-//         .catch((err) => {
-//             return res
-//                 .status(httpStatus.INTERNAL_SERVER_ERROR)
-//                 .send({ message: 'Error' });
-//         });
-// };
+    await util
+        .update(id, body)
+        .then(() => {
+            return res.status(httpStatus.OK).send({ message: 'Updated'});
+        })
+        .catch((err) => {
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Error' });
+        });
+};
 
 const remove = async (req, res) => {
-    let id = req.params.itemID;
+    let id = req.params.itemPerRoomID;
+
+    let ipr = await util.get(id);
+    if (!ipr) {
+        return res
+        .status(httpStatus.NOT_FOUND)
+        .send({ message: 'Not found' });
+    }
+
 
     await util
         .remove(id)
-        .then((removeResponse) => {
-            if (removeResponse == 0) {
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
+        .then(() => {
             return res
                 .status(httpStatus.OK)
                 .send({ message: 'Removed successfully'});
@@ -165,8 +161,9 @@ const remove = async (req, res) => {
 module.exports = {
     create,
     createMany,
-    get,
     getByRoom,
+    get,
     getAll,
+    update,
     remove
 }

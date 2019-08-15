@@ -1,85 +1,69 @@
 const db = require('../../../../../config/database');
-const sequelize = db.sequelize;
+let ItemsPerRoom = require('../../models/items_per_room');
+ItemsPerRoom = ItemsPerRoom(db.sequelize, db.Sequelize);
 
 const create = async (params, body) => {
-    
-    const query = `INSERT INTO Items_per_room (itemID, sectionalID, blockID, roomID) VALUES
-        ('${body.itemID}', '${params.sectionalID}','${params.blockID}', '${params.roomID}')`;
+    let itemID = body.itemID;
+    let { sectionalID, blockID, roomID } = params;
 
-    await sequelize.query(query);
+    ItemsPerRoom.create({
+        itemID,
+        sectionalID,
+        blockID,
+        roomID
+    });
 }
 
 const createMany = async (sectionalID, blockID, body) => {
     let rooms = body.rooms;
-    
+
     for (let i = 0; i < numbers.length; i++) {
         await create(sectionalID, blockID, rooms[i]);
     }
 }
 
-const get = async (params) => {
-    const query = `SELECT * FROM Room WHERE sectionalID = '${sectional}' AND blockID = '${block}' AND id = '${id}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
+const get = async (id) => {
+    let data = await ItemsPerRoom.findAll({
+        where: { id }
+    })
     return data[0];
 }
 
-// const getByBlock = async (sectional, block) => {
-//     const query = `SELECT * FROM Room WHERE sectionalID = '${sectional}' AND blockID = '${block}'`;
-
-//     let data = await sequelize.query(query);
-//     data = JSON.parse(JSON.stringify(data[0]));
-
-//     return data;
-// }
-
 const getByRoom = async (params) => {
-    const query = `SELECT item.id as itemID, sectionalID, blockID, roomID, item.name, item_status.description as status
+    const query = `SELECT items_per_room.id as iprID, item.id as itemID, sectionalID, blockID, roomID, item.name, item_status.description as status
         FROM items_per_room JOIN item JOIN item_status
         WHERE item.id = items_per_room.itemID and item.statusID = item_status.id
         AND sectionalID = '${params.sectionalID}' AND blockID = '${params.blockID}' AND roomID = '${params.roomID}'`;
 
-    let data = await sequelize.query(query);
+    let data = await db.sequelize.query(query);
     data = JSON.parse(JSON.stringify(data[0]));
 
     return data;
 }
 
 const getAll = async () => {
-    const query = `SELECT * FROM Items_per_room`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    return ItemsPerRoom.findAll();
 }
 
-// const update = async (sectional, block, id, body) => {
-//     !body.sectionalID ? sectional : body.sectional;
-//     if (!body.sectionalID) {
-//         body.sectionalID = sectional
-//     } 
+const update = async (id, body) => {
+    let { itemID, sectionalID, blockID, roomID } = body;
 
-//     const query = `UPDATE Room SET id = '${body.id}',
-//         sectionalID = '${body.sectionalID}', capacity = '${body.capacity}', type = '${body.type}'
-//         WHERE sectionalID = '${sectional}'  AND blockID = '${block}' AND id = '${id}'`;
-
-//     let res = await sequelize.query(query);
-//     return res[0].info;
-// }
+    ItemsPerRoom.update(
+        { itemID, sectionalID, blockID, roomID },
+        { where: { id } }
+    );
+}
 
 const remove = async (id) => {
-    const query = `DELETE FROM Items_per_room WHERE id = '${id}'`;
-
-    let res = await sequelize.query(query);
-    return res[0].affectedRows;
+    ItemsPerRoom.destroy({
+        where: { id }
+    });
 }
 
 module.exports = {
     create,
     createMany,
+    update,
     get,
     getByRoom,
     getAll,

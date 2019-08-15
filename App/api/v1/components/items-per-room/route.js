@@ -7,7 +7,7 @@ router.route('/')
     .post((req, res) => controller.create(req, res))
     .get((req, res) => controller.getByRoom(req, res));
 
-router.route('/:itemID')
+router.route('/:itemPerRoomID')
     .get((req, res) => controller.get(req, res))
     .put((req, res) => controller.update(req, res))
     .delete((req, res) => controller.remove(req, res));

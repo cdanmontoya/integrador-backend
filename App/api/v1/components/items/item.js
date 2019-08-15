@@ -1,74 +1,67 @@
-const db = require('../../../../../config/database');
-const sequelize = db.sequelize;
-
 const config = require('./config');
+const db = require('../../../../../config/database');
+
+let Item = require('../../models/item');
+Item = Item(db.sequelize, db.Sequelize);
 
 const create = async (body) => {
-    const query = `INSERT INTO Item (name, typeID, statusID) VALUES
-    ('${body.name}', '${body.typeID}', '${body.statusID}')`;
+    let { name, typeID, statusID } = body;
 
-    await sequelize.query(query);
+    Item.create({
+        name,
+        typeID,
+        statusID
+    });
 }
 
 const get = async (id) => {
-    const query = `SELECT * FROM Item WHERE Item.id = '${id}'`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
+    let data = await Item.findAll({
+        where: { id }
+    });
     return data[0];
 }
 
 const getAll = async () => {
-    const query = `SELECT * FROM Item`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-
-    return data;
+    return Item.findAll();
 }
 
-const update = async (id, body) => {
-    const query = `UPDATE Item SET name = '${body.name}', typeID = '${body.typeID}', statusID = '${body.statusID}',
-    WHERE id = '${id}'`;
+const update = async (query_id, body) => {
+    let { name, typeID, statusID } = body;
 
-    let res = await sequelize.query(query);
-    return res[0].info;
+    // If there is a new status, we neet to check if is a valid one
+    // statusID has the new state from the request body
+    if (statusID) {
+        let item = await get(query_id);
+        let actualState = item.statusID
+
+        try {
+            checkState(actualState, statusID);
+            Item.update(
+                { name, typeID, statusID },
+                { where: { id: query_id } }
+            );
+            return;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    // Otherwise, just update the item
+    Item.update(
+        { name, typeID },
+        { where: { id: query_id } }
+    );
 }
 
 const remove = async (id) => {
-    const query = `DELETE FROM Item WHERE id = '${id}'`;
-
-    let res = await sequelize.query(query);
-    return res[0].affectedRows;
-}
-
-const changeState = async (params, body) => {
-    let event = await get(params.eventID);
-    let actualState = event.stateID;
-    let newState = body.stateID;
-
-    const query = `UPDATE Item SET stateID = ${body.stateID} 
-        WHERE id = '${params.eventID}'`;
-
-    try {
-        checkState(actualState, newState);
-
-        let res = await sequelize.query(query);
-        return res[0].info;
-
-    } catch (error) {
-        throw error;
-    }
+    Item.destroy({
+        where: { id }
+    });
 }
 
 const checkState = (actualState, newState) => {
-    if (actualState == newState) {
-        throw "Error: the states must be different"
-    }
-
-    if (actualState == config.IN_LOAN) {
-        if (newState == config.AVAILABLE || newState == config.NOT_AVAILABLE) {
+    if (actualState == config.RESERVED) {
+        if (newState == config.NOT_AVAILABLE) {
             throw "Error: Can't change status";
         }
     }
@@ -85,6 +78,5 @@ module.exports = {
     get,
     getAll,
     update,
-    remove,
-    changeState
+    remove
 }

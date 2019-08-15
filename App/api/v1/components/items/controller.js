@@ -70,20 +70,11 @@ const update = async (req, res) => {
 
     await util
         .update(itemID, body)
-        .then((updateResponse) => {
-            // Verifica que si haya encontrado el registro
-            // ¿Se puede mejorar con una expresión regular?
-            updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-            if (updateResponse[1].charAt(0) == 0) { 
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
-            return res.status(httpStatus.OK).send({ message: 'Updated'});
+        .then(() => {
+            return res.status(httpStatus.OK).send({ message: 'Updated' });
         })
         .catch((err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Error' });
@@ -104,7 +95,7 @@ const remove = async (req, res) => {
 
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully'});
+                .send({ message: 'Removed successfully' });
         })
         .catch((err) => {
             console.error(err)
@@ -123,15 +114,15 @@ const changeState = async (req, res) => {
         .then((updateResponse) => {
             // Verifica que si haya encontrado el registro
             // ¿Se puede mejorar con una expresión regular?
-            updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-            if (updateResponse[1].charAt(0) == 0) { 
+            updateResponse = updateResponse.replace(/\s/g, '').split(':');
+
+            if (updateResponse[1].charAt(0) == 0) {
                 return res
                     .status(httpStatus.NOT_FOUND)
                     .send({ message: 'Not found' });
             }
 
-            return res.status(httpStatus.OK).send({ message: 'Updated'});
+            return res.status(httpStatus.OK).send({ message: 'Updated' });
         })
         .catch((err) => {
             console.log(err)
