@@ -59,11 +59,6 @@ const remove = async (sectionalID, blockID, id) => {
     Room.destroy({
         where: { sectionalID, blockID, id }
     });
-    
-    // const query = `DELETE FROM Room WHERE sectionalID = '${sectional}'  AND blockID = '${block}' AND id = '${id}'`;
-
-    // let res = await sequelize.query(query);
-    // return res[0].affectedRows;
 }
 
 module.exports = {
