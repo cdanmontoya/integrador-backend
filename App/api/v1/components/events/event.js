@@ -37,33 +37,38 @@ const getAll = async () => {
 }
 
 const update = async (params, body) => {
-    const query = `UPDATE Event SET name = '${body.name}',
-        startTime = '${body.startTime}', endTime = '${body.endTime}', eventType = '${body.eventType}', 
-        stateID = '${body.stateID}', description = '${body.description}', userID = '${body.userID}',
-        blockID = '${params.blockID}', roomID = '${params.roomID}', sectionalID = '${params.sectionalID}'
-        WHERE id = '${params.eventID}'`;
+    let { name, startTime, endTime, eventType, stateID, description, userID, statusID } = body;
+    let { blockID, roomID, sectionalID, eventID } = params;
 
-    let res = await sequelize.query(query);
-    return res[0].info;
-}
+    let updateArgs = {
+        name,
+        startTime,
+        endTime,
+        eventType,
+        stateID,
+        description,
+        userID,
+        sectionalID,
+        blockID,
+        roomID
+    };
 
-const changeState = async (params, body) => {
-    let event = await get(params.eventID);
-    let actualState = event.stateID;
-    let newState = body.stateID;
+    if (stateID) {
+        let event = await get(eventID);
+        let actualState = event.stateID;
 
-    const query = `UPDATE Event SET stateID = ${body.stateID} 
-        WHERE id = '${params.eventID}'`;
-
-    try {
-        checkState(actualState, newState);
-
-        let res = await sequelize.query(query);
-        return res[0].info;
-
-    } catch (error) {
-        throw error;
+        try {
+            checkState(actualState, stateID);
+            updateArgs.stateID = stateID;
+        } catch (error) {
+            throw error;
+        }
     }
+
+    Event.update(
+        updateArgs,
+        { where: { id: eventID } }
+    );
 }
 
 const checkState = (actualState, newState) => {
@@ -97,6 +102,5 @@ module.exports = {
     getByRoom,
     getAll,
     update,
-    remove,
-    changeState
+    remove
 }

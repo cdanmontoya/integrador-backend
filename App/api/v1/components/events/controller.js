@@ -94,26 +94,21 @@ const update = async (req, res) => {
     let body = req.body;
     let params = req.params;
 
+    let eventID = params.id;
+    let event = util.get(eventID);
+
+    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
+
     await util
         .update(params, body)
-        .then((updateResponse) => {
-            // Verifica que si haya encontrado el registro
-            // ¿Se puede mejorar con una expresión regular?
-            updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-            if (updateResponse[1].charAt(0) == 0) { 
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
+        .then(() => {
             return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
             console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error' });
+                .send({ message: 'Error', err });
         });
 };
 
