@@ -140,6 +140,9 @@ const changeState = async (req, res) => {
 
 const remove = async (req, res) => {
     let id = req.params.eventID;
+    let event = util.get(id);
+
+    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
 
     await util
         .remove(id)
