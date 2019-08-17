@@ -16,7 +16,9 @@ router.route('/:roomID')
     .delete((req, res) => controller.remove(req, res));
 
 const events = require('../events/route');
+const items = require('../items-per-room/route');
 
 router.use('/:roomID/events', events);
+router.use('/:roomID/items', items);
 
 module.exports = router;

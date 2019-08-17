@@ -12,9 +12,6 @@ router.route('/:requestID')
     .put((req, res) => controller.update(req, res))
     .delete((req, res) => controller.remove(req, res));
 
-router.route('/:requestID/changestate')
-    .put((req, res) => controller.changeState(req, res));
-
 const items = require('../items-per-request/route');
 
 router.use('/:requestID/items', items);

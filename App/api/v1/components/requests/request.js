@@ -1,72 +1,77 @@
+const config = require('./config');
 const db = require('../../../../../config/database');
-const sequelize = db.sequelize;
+
+let Request = require('../../models/request');
+Request = Request(db.sequelize, db.Sequelize);
+// let ItemsPerRequest = require('../../models/items_per_request');
 
 const itemsPerRequest = require('../items-per-request/itemsPerRequest')
 
-const config = require('./config');
 
 const create = async (body) => {
-    const query = `INSERT INTO Request (requestType, description, stateID, createdBy, createdAt, sectionalID, blockID, roomID, startTime, endTime) VALUES
-    ('${body.requestType}', '${body.description}', '${body.stateID}', '${body.createdBy}', '${body.createdAt}', '${body.sectionalID}', '${body.blockID}', '${body.roomID}', '${body.startTime}', '${body.endTime}')`;
+    let { requestType, description, stateID, createdBy, sectionalID, blockID, roomID, startTime, endTime, items } = body;
+    let createdAt = new Date();
+    startTime = new Date(startTime);
+    endTime = new Date(endTime);
 
-    let res = await sequelize.query(query);
-
-    itemsPerRequest.createMany(res[0], body.items);
+    Request.create({
+        requestType,
+        description,
+        stateID,
+        createdBy,
+        createdAt,
+        sectionalID,
+        blockID,
+        roomID,
+        startTime,
+        endTime
+    }).then(request => {
+        let requestID = request.dataValues.id;
+        itemsPerRequest.createMany(requestID, items);
+    });
 }
 
 const get = async (id) => {
-    const query = `SELECT * FROM Request WHERE id = '${id}'`;
-
-    let data = await sequelize.query(query);
-
-    data = JSON.parse(JSON.stringify(data[0]));
-
+    let data = await Request.findAll({ where: { id } });
     return data[0];
 }
 
 const getAll = async () => {
-    const query = `SELECT * FROM Request`;
-
-    let data = await sequelize.query(query);
-    data = JSON.parse(JSON.stringify(data[0]));
-    
-    return data;
+    return Request.findAll();
 }
 
 const update = async (id, body) => {
-    const query = `UPDATE Request SET
-        requestType = '${body.requestType}', description = '${body.description}', statusID ='${body.statusID}', createdBy = '${body.createdBy}', createdAt = '${body.createdAt}', attendedBy = '${body.attendedBy}', sectionalID = '${body.sectionalID}', blockID = '${body.blockID}', roomID = '${body.roomID}', eventID = '${body.eventID}', startTime = '${body.startTime}', endTime = '${body.endTime}'
-        WHERE id = '${id}'`;
+    let { requestType, description, stateID, createdBy, sectionalID, blockID, roomID, eventID, startTime, endTime } = body;
 
-    let res = await sequelize.query(query);
-    return res[0].info;
+    let updateArgs = {
+        requestType, description, createdBy, sectionalID, blockID, roomID, eventID, startTime, endTime
+    };
+
+    if (stateID) {
+        let request = await get(id);
+        let actualState = request.stateID;
+
+        try {
+            checkState(requestType, actualState, stateID);
+            updateArgs.stateID = stateID;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    Request.update(
+        updateArgs,
+        { where: { id } }
+    );
 }
 
 const remove = async (id) => {
-    const query = `DELETE FROM Request WHERE id = '${id}'`;
 
-    let res = await sequelize.query(query);
-    return res[0].affectedRows;
-}
+    Request.destroy({ where: { id } })
+    // const query = `DELETE FROM Request WHERE id = '${id}'`;
 
-const changeState = async (params, body) => {
-    let request = await get(params.requestID);
-    let requestType = request.requestType;
-    let actualState = request.stateID;
-    let newState = body.stateID;
-
-    const query = `UPDATE Request SET stateID = ${body.stateID} 
-        WHERE id = '${params.requestID}'`;
-
-    try {
-        checkState(requestType, actualState, newState);
-
-        let res = await sequelize.query(query);
-        return res[0].info;
-
-    } catch (error) {
-        throw error;
-    }
+    // let res = await sequelize.query(query);
+    // return res[0].affectedRows;
 }
 
 const checkState = (requestType, actualState, newState) => {
@@ -132,6 +137,5 @@ module.exports = {
     get,
     getAll,
     update,
-    remove,
-    changeState
+    remove
 }

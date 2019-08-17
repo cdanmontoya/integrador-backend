@@ -1,29 +1,29 @@
-const util = require('./request');
+const util = require('./roomsPerLogisticUnit');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
     let body = req.body;
+    let params = req.params;
 
-    await util.create(body).then(
-        (request) => {
-            console.log(request)
+    await util.create(params, body).then(
+        () => {
             return res
                 .status(httpStatus.CREATED)
-                .send({ message: 'Created', request });
+                .send({ message: 'Created' });
         },
         (err) => {
             console.error(err);
             return res
                 .status(httpStatus.BAD_REQUEST)
-                .send({ message: 'Error' })
+                .send({ message: err })
         }
     );
 };
 
 const get = async (req, res) => {
-    let requestID = req.params.requestID;
+    let rpluID = req.params.rpluID;
 
-    await util.get(requestID).then(
+    await util.get(rpluID).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -42,6 +42,51 @@ const get = async (req, res) => {
         }
     );
 };
+
+const getUnsupervisedRooms = async (req, res) => {
+    await util.getUnsupervisedRooms().then(
+        (data) => {
+            if (data.length > 0) {
+                return res
+                    .status(httpStatus.OK)
+                    .send(data);
+            } else {
+                return res
+                    .status(httpStatus.NO_CONTENT)
+                    .send({ message: 'No data found' });
+            }
+        },
+        (err) => {
+            console.error(err);
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Error' });
+        }
+    );
+}
+
+const getByLogisticUnit = async (req, res) => {
+    const logisticUnit = req.params.username;
+
+    await util.getByLogisticUnit(logisticUnit).then(
+        (data) => {
+            if (!data || data.length == 0) {
+                return res
+                    .status(httpStatus.NOT_FOUND)
+                    .send({ message: 'Not found' });
+            } else {
+                return res
+                    .status(httpStatus.OK)
+                    .send(data);
+            }
+        },
+        (err) => {
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Internal server error' });
+        }
+    );
+}
 
 const getAll = async (req, res) => {
     await util.getAll().then(
@@ -65,43 +110,22 @@ const getAll = async (req, res) => {
     );
 };
 
-const update = async (req, res) => {
-    let body = req.body;
-    let requestID = req.params.requestID;
-
-    let request = await util.get(requestID);
-    if (!request) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
-
-    await util
-        .update(requestID, body)
-        .then(() => {
-            return res.status(httpStatus.OK).send({ message: 'Updated'});
-        })
-        .catch((err) => {
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error', err });
-        });
-};
-
 const remove = async (req, res) => {
-    let requestID = req.params.requestID;
+    let rpluID = req.params.rpluID;
 
-    let request = await util.get(requestID);
-    if (!request) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
+    let rplu = await util.get(rpluID);
+    if (!rplu) {
+        return res
+            .status(httpStatus.NOT_FOUND)
+            .send({ message: 'Not found' });
+    }
 
     await util
         .remove(requestID)
-        .then((removeResponse) => {
-            if (removeResponse == 0) {
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
+        .then(() => {
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully'});
+                .send({ message: 'Removed successfully' });
         })
         .catch((err) => {
             console.error(err)
@@ -114,7 +138,8 @@ const remove = async (req, res) => {
 module.exports = {
     create,
     get,
+    getByLogisticUnit,
+    getUnsupervisedRooms,
     getAll,
-    update,
     remove
 }

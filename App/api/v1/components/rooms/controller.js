@@ -2,7 +2,7 @@ const util = require('./room');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
-    let sectional = req.params.sectionalID; 
+    let sectional = req.params.sectionalID;
     let block = req.params.blockID;
     let body = req.body;
 
@@ -22,7 +22,7 @@ const create = async (req, res) => {
 };
 
 const createMany = async (req, res) => {
-    let sectional = req.params.sectionalID; 
+    let sectional = req.params.sectionalID;
     let block = req.params.blockID;
 
     let body = req.body;
@@ -91,6 +91,31 @@ const getByBlock = async (req, res) => {
     );
 };
 
+const getAvailableRooms = async (req, res) => {
+    let startTime = req.body.startTime;
+    let endTime = req.body.endTime;
+
+    await util.getAvailableRooms(startTime, endTime).then(
+        (data) => {
+            if (data.length > 0) {
+                return res
+                    .status(httpStatus.OK)
+                    .send(data);
+            } else {
+                return res
+                    .status(httpStatus.NO_CONTENT)
+                    .send({ message: 'No data found' });
+            }
+        },
+        (err) => {
+            console.error(err);
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Error' });
+        }
+    );
+}
+
 const getAll = async (req, res) => {
     await util.getAll().then(
         (data) => {
@@ -121,18 +146,8 @@ const update = async (req, res) => {
 
     await util
         .update(sectional, number, id, body)
-        .then((updateResponse) => {
-            // Verifica que si haya encontrado el registro
-            // ¿Se puede mejorar con una expresión regular?
-            updateResponse = updateResponse.replace(/\s/g,'').split(':');
-            
-            if (updateResponse[1].charAt(0) == 0) { 
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
-
-            return res.status(httpStatus.OK).send({ message: 'Updated'});
+        .then(() => {
+            return res.status(httpStatus.OK).send({ message: 'Updated' });
         })
         .catch((err) => {
             return res
@@ -157,7 +172,7 @@ const remove = async (req, res) => {
 
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully'});
+                .send({ message: 'Removed successfully' });
         })
         .catch((err) => {
             console.error(err)
@@ -172,6 +187,7 @@ module.exports = {
     createMany,
     get,
     getByBlock,
+    getAvailableRooms,
     getAll,
     update,
     remove
