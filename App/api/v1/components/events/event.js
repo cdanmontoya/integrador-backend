@@ -4,7 +4,6 @@ const db = require('../../../../../config/database');
 let Event = require('../../models/event');
 Event = Event(db.sequelize, db.Sequelize);
 
-
 const create = async (params, body) => {
     let { name, startTime, endTime, eventType, stateID, description, userID } = body;
     let { sectionalID, blockID, roomID } = params;
