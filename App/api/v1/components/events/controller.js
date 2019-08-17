@@ -1,33 +1,11 @@
-const util = require('./room');
+const util = require('./event');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
-    let sectional = req.params.sectionalID;
-    let block = req.params.blockID;
+    let params = req.params;
     let body = req.body;
 
-    await util.create(sectional, block, body).then(
-        () => {
-            return res
-                .status(httpStatus.CREATED)
-                .send({ message: 'Created' });
-        },
-        (err) => {
-            console.error(err);
-            return res
-                .status(httpStatus.BAD_REQUEST)
-                .send({ message: 'Error' })
-        }
-    );
-};
-
-const createMany = async (req, res) => {
-    let sectional = req.params.sectionalID;
-    let block = req.params.blockID;
-
-    let body = req.body;
-
-    await util.createMany(sectional, block, body).then(
+    await util.create(params, body).then(
         () => {
             return res
                 .status(httpStatus.CREATED)
@@ -43,11 +21,9 @@ const createMany = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let sectional = req.params.sectionalID;
-    let number = req.params.blockID;
-    let id = req.params.roomID;
+    let id = req.params.eventID;
 
-    await util.get(sectional, number, id).then(
+    await util.get(id).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -60,6 +36,7 @@ const get = async (req, res) => {
             }
         },
         (err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
@@ -67,11 +44,10 @@ const get = async (req, res) => {
     );
 };
 
-const getByBlock = async (req, res) => {
-    let sectional = req.params.sectionalID;
-    let block = req.params.blockID;
+const getByRoom = async (req, res) => {
+    let params = req.params;
 
-    await util.getByBlock(sectional, block).then(
+    await util.getByRoom(params).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -84,34 +60,10 @@ const getByBlock = async (req, res) => {
             }
         },
         (err) => {
+            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Internal server error' });
-        }
-    );
-};
-
-const getAvailableRooms = async (req, res) => {
-    let startTime = req.body.startTime;
-    let endTime = req.body.endTime;
-
-    await util.getAvailableRooms(startTime, endTime).then(
-        (data) => {
-            if (data.length > 0) {
-                return res
-                    .status(httpStatus.OK)
-                    .send(data);
-            } else {
-                return res
-                    .status(httpStatus.NO_CONTENT)
-                    .send({ message: 'No data found' });
-            }
-        },
-        (err) => {
-            console.error(err);
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error' });
         }
     );
 }
@@ -140,29 +92,60 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     let body = req.body;
-    let sectional = req.params.sectionalID;
-    let number = req.params.blockID;
-    let id = req.params.roomID;
+    let params = req.params;
+
+    let eventID = params.id;
+    let event = util.get(eventID);
+
+    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
 
     await util
-        .update(sectional, number, id, body)
+        .update(params, body)
         .then(() => {
-            return res.status(httpStatus.OK).send({ message: 'Updated' });
+            return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error' });
+                .send({ message: 'Error', err });
         });
 };
 
-const remove = async (req, res) => {
-    let sectional = req.params.sectionalID;
-    let number = req.params.blockID;
-    let id = req.params.roomID;
+const changeState = async (req, res) => {
+    let params = req.params;
+    let body = req.body;
 
     await util
-        .remove(sectional, number, id)
+        .changeState(params, body)
+        .then((updateResponse) => {
+            // Verifica que si haya encontrado el registro
+            // ¿Se puede mejorar con una expresión regular?
+            updateResponse = updateResponse.replace(/\s/g,'').split(':');
+            
+            if (updateResponse[1].charAt(0) == 0) { 
+                return res
+                    .status(httpStatus.NOT_FOUND)
+                    .send({ message: 'Not found' });
+            }
+
+            return res.status(httpStatus.OK).send({ message: 'Updated'});
+        })
+        .catch((err) => {
+            console.log(err)
+            return res
+                .status(httpStatus.INTERNAL_SERVER_ERROR)
+                .send({ message: 'Error', err });
+        });
+}
+
+const remove = async (req, res) => {
+    let id = req.params.eventID;
+    let event = util.get(id);
+
+    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
+
+    await util
+        .remove(id)
         .then((removeResponse) => {
             if (removeResponse == 0) {
                 return res
@@ -172,7 +155,7 @@ const remove = async (req, res) => {
 
             return res
                 .status(httpStatus.OK)
-                .send({ message: 'Removed successfully' });
+                .send({ message: 'Removed successfully'});
         })
         .catch((err) => {
             console.error(err)
@@ -184,11 +167,10 @@ const remove = async (req, res) => {
 
 module.exports = {
     create,
-    createMany,
     get,
-    getByBlock,
-    getAvailableRooms,
+    getByRoom,
     getAll,
     update,
-    remove
+    remove,
+    changeState
 }
