@@ -12,7 +12,4 @@ router.route('/:eventID')
     .put((req, res) => controller.update(req, res))
     .delete((req, res) => controller.remove(req, res));
 
-router.route('/:eventID/changestate')
-    .put((req, res) => controller.changeState(req, res));
-
 module.exports = router;

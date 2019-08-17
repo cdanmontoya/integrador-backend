@@ -105,7 +105,6 @@ const update = async (req, res) => {
             return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
-            console.error(err)
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Error', err });
