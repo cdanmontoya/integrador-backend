@@ -1,95 +1,95 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('request', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     requestType: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'request_type',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     description: {
       type: DataTypes.STRING(50),
-      allowNull: true
+      allowNull: true,
     },
     stateID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'request_state',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     createdBy: {
       type: DataTypes.STRING(50),
       allowNull: true,
       references: {
         model: 'user',
-        key: 'username'
-      }
+        key: 'username',
+      },
     },
     createdAt: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     attendedBy: {
       type: DataTypes.STRING(50),
       allowNull: true,
       references: {
         model: 'user',
-        key: 'username'
-      }
+        key: 'username',
+      },
     },
     sectionalID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'sectionalID'
-      }
+        key: 'sectionalID',
+      },
     },
     blockID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'blockID'
-      }
+        key: 'blockID',
+      },
     },
     roomID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     eventID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'event',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     startTime: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     endTime: {
       type: DataTypes.DATE,
-      allowNull: true
-    }
+      allowNull: true,
+    },
   }, {
     tableName: 'request',
-    timestamps: false
+    timestamps: false,
   });
 };

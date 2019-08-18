@@ -1,10 +1,11 @@
-const Router = require('express').Router;
-let router = new Router();
+const { Router } = require('express');
+
+const router = new Router();
 
 /**
  * References to each resource routers
  */
-let apiv1 = require('./api/v1/route');
+const apiv1 = require('./api/v1/route');
 
 router.use('/api/v1', apiv1);
 

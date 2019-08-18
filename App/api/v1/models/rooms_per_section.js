@@ -1,47 +1,47 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('rooms_per_section', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     sectionID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'section',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     roomID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     blockID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'blockID'
-      }
+        key: 'blockID',
+      },
     },
     sectionalID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'sectionalID'
-      }
-    }
+        key: 'sectionalID',
+      },
+    },
   }, {
     tableName: 'rooms_per_section',
-    timestamps: false
+    timestamps: false,
   });
 };

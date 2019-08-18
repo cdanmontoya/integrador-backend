@@ -1,79 +1,79 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('event', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     name: {
       type: DataTypes.STRING(50),
-      allowNull: true
+      allowNull: true,
     },
     startTime: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     endTime: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     eventType: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'event_type',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     sectionalID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'sectionalID'
-      }
+        key: 'sectionalID',
+      },
     },
     blockID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'blockID'
-      }
+        key: 'blockID',
+      },
     },
     roomID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'room',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     stateID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'event_state',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     description: {
       type: DataTypes.STRING(50),
-      allowNull: true
+      allowNull: true,
     },
     userID: {
       type: DataTypes.STRING(50),
       allowNull: true,
       references: {
         model: 'user',
-        key: 'username'
-      }
-    }
+        key: 'username',
+      },
+    },
   }, {
     tableName: 'event',
-    timestamps: false
+    timestamps: false,
   });
 };

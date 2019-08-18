@@ -1,6 +1,6 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('items_per_request', {
     requestID: {
       type: DataTypes.INTEGER(11),
@@ -8,8 +8,8 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'request',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     itemType: {
       type: DataTypes.INTEGER(11),
@@ -17,15 +17,15 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'item_type',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     quantity: {
       type: DataTypes.INTEGER(11),
-      allowNull: true
-    }
+      allowNull: true,
+    },
   }, {
     tableName: 'items_per_request',
-    timestamps: false
+    timestamps: false,
   });
 };

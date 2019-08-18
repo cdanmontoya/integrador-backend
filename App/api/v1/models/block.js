@@ -1,11 +1,11 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('block', {
     number: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
     },
     sectionalID: {
       type: DataTypes.INTEGER(11),
@@ -13,11 +13,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'sectional',
-        key: 'id'
-      }
-    }
+        key: 'id',
+      },
+    },
   }, {
     tableName: 'block',
-    timestamps: false
+    timestamps: false,
   });
 };
