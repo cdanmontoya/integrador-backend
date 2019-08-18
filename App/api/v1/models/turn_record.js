@@ -1,35 +1,35 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('turn_record', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     updatedAt: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     updatedBy: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
     },
     comment: {
       type: DataTypes.STRING(50),
-      allowNull: true
+      allowNull: true,
     },
     turnID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
       references: {
         model: 'turn',
-        key: 'id'
-      }
-    }
+        key: 'id',
+      },
+    },
   }, {
     tableName: 'turn_record',
-    timestamps: false
+    timestamps: false,
   });
 };

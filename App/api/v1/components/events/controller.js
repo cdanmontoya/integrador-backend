@@ -1,148 +1,148 @@
-const util = require('./event');
 const httpStatus = require('http-status');
+const util = require('./event');
 
 const create = async (req, res) => {
-    let params = req.params;
-    let body = req.body;
+  const { params } = req;
+  const { body } = req;
 
-    await util.create(params, body).then(
-        () => {
-            return res
-                .status(httpStatus.CREATED)
-                .send({ message: 'Created' });
-        },
-        (err) => {
-            console.error(err);
-            return res
-                .status(httpStatus.BAD_REQUEST)
-                .send({ message: 'Error' })
-        }
-    );
+  await util.create(params, body).then(
+    () => res
+      .status(httpStatus.CREATED)
+      .send({ message: 'Created' }),
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .send({ message: 'Error' });
+    },
+  );
 };
 
 const get = async (req, res) => {
-    let id = req.params.eventID;
+  const id = req.params.eventID;
 
-    await util.get(id).then(
-        (data) => {
-            if (!data || data.length == 0) {
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            } else {
-                return res
-                    .status(httpStatus.OK)
-                    .send(data);
-            }
-        },
-        (err) => {
-            console.error(err)
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Internal server error' });
-        }
-    );
+  await util.get(id).then(
+    (data) => {
+      if (!data || data.length === 0) {
+        return res
+          .status(httpStatus.NOT_FOUND)
+          .send({ message: 'Not found' });
+      }
+      return res
+        .status(httpStatus.OK)
+        .send(data);
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
+    },
+  );
 };
 
 const getByRoom = async (req, res) => {
-    let params = req.params;
+  const { params } = req;
 
-    await util.getByRoom(params).then(
-        (data) => {
-            if (!data || data.length == 0) {
-                return res
-                    .status(httpStatus.NO_CONTENT)
-                    .send({ message: 'No content' });
-            } else {
-                return res
-                    .status(httpStatus.OK)
-                    .send(data);
-            }
-        },
-        (err) => {
-            console.error(err)
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Internal server error' });
-        }
-    );
-}
+  await util.getByRoom(params).then(
+    (data) => {
+      if (!data || data.length === 0) {
+        return res
+          .status(httpStatus.NO_CONTENT)
+          .send({ message: 'No content' });
+      }
+      return res
+        .status(httpStatus.OK)
+        .send(data);
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
+    },
+  );
+};
 
 const getAll = async (req, res) => {
-    await util.getAll().then(
-        (data) => {
-            if (data.length > 0) {
-                return res
-                    .status(httpStatus.OK)
-                    .send(data);
-            } else {
-                return res
-                    .status(httpStatus.NO_CONTENT)
-                    .send({ message: 'No data found' });
-            }
-        },
-        (err) => {
-            console.error(err);
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error' });
-        }
-    );
+  await util.getAll().then(
+    (data) => {
+      if (data.length > 0) {
+        return res
+          .status(httpStatus.OK)
+          .send(data);
+      }
+      return res
+        .status(httpStatus.NO_CONTENT)
+        .send({ message: 'No data found' });
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
+    },
+  );
 };
 
 const update = async (req, res) => {
-    let body = req.body;
-    let params = req.params;
+  const { body } = req;
+  const { params } = req;
 
-    let eventID = params.eventID;
-    let event = util.get(eventID);
+  const { eventID } = params;
+  const event = util.get(eventID);
 
-    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
+  if (!event) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
-    await util
-        .update(params, body)
-        .then(() => {
-            return res.status(httpStatus.OK).send({ message: 'Updated'});
-        })
-        .catch((err) => {
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error', err });
-        });
+  await util
+    .update(params, body)
+    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .catch((err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error', err });
+    });
+  return true;
 };
 
 const remove = async (req, res) => {
-    let id = req.params.eventID;
-    let event = util.get(id);
+  const id = req.params.eventID;
+  const event = util.get(id);
 
-    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
+  if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
 
-    await util
-        .remove(id)
-        .then((removeResponse) => {
-            if (removeResponse == 0) {
-                return res
-                    .status(httpStatus.NOT_FOUND)
-                    .send({ message: 'Not found' });
-            }
+  await util
+    .remove(id)
+    .then((removeResponse) => {
+      if (removeResponse === 0) {
+        return res
+          .status(httpStatus.NOT_FOUND)
+          .send({ message: 'Not found' });
+      }
 
-            return res
-                .status(httpStatus.OK)
-                .send({ message: 'Removed successfully'});
-        })
-        .catch((err) => {
-            console.error(err)
-            return res
-                .status(httpStatus.INTERNAL_SERVER_ERROR)
-                .send({ message: 'Error' });
-        });
+      return res
+        .status(httpStatus.OK)
+        .send({ message: 'Removed successfully' });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
+    });
+  return true;
 };
 
 module.exports = {
-    create,
-    get,
-    getByRoom,
-    getAll,
-    update,
-    remove
-}
+  create,
+  get,
+  getByRoom,
+  getAll,
+  update,
+  remove,
+};

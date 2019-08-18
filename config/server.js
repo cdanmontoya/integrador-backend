@@ -14,8 +14,8 @@ const routes = require('../App/routes');
  * Importing configuration variables
  */
 const {
-    port,
-    morganMode
+  port,
+  morganMode,
 } = require('./config');
 
 /**
@@ -23,13 +23,13 @@ const {
  * @param {*} app Basic Express app
  */
 const server = async (app) => {
-    app.disable('x-powered-by');
-    app.set('port', port);
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(morgan(morganMode));
-    app.use(cors());
-    app.use('/', routes);
-}
+  app.disable('x-powered-by');
+  app.set('port', port);
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(morgan(morganMode));
+  app.use(cors());
+  app.use('/', routes);
+};
 
 module.exports = server;

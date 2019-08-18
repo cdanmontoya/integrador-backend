@@ -1,6 +1,6 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('rooms_per_turn', {
     turnID: {
       type: DataTypes.INTEGER(11),
@@ -8,8 +8,8 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'turn',
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     sectionalID: {
       type: DataTypes.INTEGER(11),
@@ -17,8 +17,8 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'room',
-        key: 'sectionalID'
-      }
+        key: 'sectionalID',
+      },
     },
     blockID: {
       type: DataTypes.INTEGER(11),
@@ -26,8 +26,8 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'room',
-        key: 'blockID'
-      }
+        key: 'blockID',
+      },
     },
     roomID: {
       type: DataTypes.INTEGER(11),
@@ -35,11 +35,11 @@ module.exports = function(sequelize, DataTypes) {
       primaryKey: true,
       references: {
         model: 'room',
-        key: 'id'
-      }
-    }
+        key: 'id',
+      },
+    },
   }, {
     tableName: 'rooms_per_turn',
-    timestamps: false
+    timestamps: false,
   });
 };

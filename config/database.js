@@ -5,11 +5,11 @@ const username = 'root';
 const password = 'root';
 
 const sequelize = new Sequelize(database, username, password, {
-    host: 'database',
-    dialect: 'mysql'
+  host: 'localhost',
+  dialect: 'mysql',
 });
 
-let db = {};
+const db = {};
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;

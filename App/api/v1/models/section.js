@@ -1,23 +1,23 @@
-/* jshint indent: 2 */
+/* eslint-disable func-names */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('section', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     logisticUnit: {
       type: DataTypes.STRING(50),
       allowNull: false,
       references: {
         model: 'user',
-        key: 'username'
-      }
-    }
+        key: 'username',
+      },
+    },
   }, {
     tableName: 'section',
-    timestamps: false
+    timestamps: false,
   });
 };
