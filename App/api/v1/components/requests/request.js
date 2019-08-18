@@ -4,10 +4,8 @@ const db = require('../../../../../config/database');
 let Request = require('../../models/request');
 
 Request = Request(db.sequelize, db.Sequelize);
-// let ItemsPerRequest = require('../../models/items_per_request');
 
 const itemsPerRequest = require('../items-per-request/itemsPerRequest');
-
 
 const create = async (body) => {
   let {
@@ -46,6 +44,71 @@ const get = async (id) => {
 
 const getAll = async () => Request.findAll();
 
+const checkState = (requestType, actualState, newState) => {
+  if (actualState === config.states.CANCELED || actualState === config.states.REJECTED
+    || actualState === config.states.DONE) {
+    return false;
+  }
+
+  switch (requestType) {
+    case config.types.RESERVE:
+      if (actualState === config.states.PENDING) {
+        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
+          && newState !== config.types.CANCELED) {
+          return true;
+        }
+        return false;
+      }
+
+      if (actualState === config.states.APPROVED) {
+        if (newState !== config.states.CANCELED) {
+          return false;
+        }
+      }
+      break;
+
+    case config.types.ASSISTANCE:
+      if (actualState === config.states.PENDING) {
+        if (newState !== config.types.IN_COURSE && newState !== config.types.REJECTED
+          && newState !== config.types.CANCELED) {
+          return false;
+        }
+      }
+
+      if (actualState === config.states.IN_COURSE) {
+        if (newState !== config.states.DONE) {
+          return false;
+        }
+      }
+      break;
+
+    case config.types.LOAN:
+      if (actualState === config.states.PENDING) {
+        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
+          && newState !== config.types.CANCELED) {
+          return false;
+        }
+      }
+
+      if (actualState === config.states.APPROVED) {
+        if (newState !== config.states.IN_COURSE) {
+          return false;
+        }
+      }
+
+      if (actualState === config.types.IN_COURSE) {
+        if (newState !== config.types.DONE) {
+          return false;
+        }
+      }
+      break;
+
+    default:
+      return false;
+  }
+  return true;
+};
+
 const update = async (id, body) => {
   const {
     requestType,
@@ -68,11 +131,8 @@ const update = async (id, body) => {
     const request = await get(id);
     const actualState = request.stateID;
 
-    try {
-      checkState(requestType, actualState, stateID);
+    if (checkState(requestType, actualState, stateID)) {
       updateArgs.stateID = stateID;
-    } catch (error) {
-      throw error;
     }
   }
 
@@ -84,70 +144,6 @@ const update = async (id, body) => {
 
 const remove = async (id) => {
   Request.destroy({ where: { id } });
-};
-
-const checkState = (requestType, actualState, newState) => {
-  if (actualState === config.states.CANCELED || actualState === config.states.REJECTED
-    || actualState === config.states.DONE) {
-    throw new Error('Error: cannot update state');
-  }
-
-  switch (requestType) {
-    case config.types.RESERVE:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return;
-        }
-        throw new Error("Error: Can't update state");
-      }
-
-      if (actualState === config.states.APPROVED) {
-        if (newState !== config.states.CANCELED) {
-          throw new Error("Error: Can't update state");
-        }
-      }
-      break;
-
-    case config.types.ASSISTANCE:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.IN_COURSE && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          throw new Error("Error: Can't update state");
-        }
-      }
-
-      if (actualState === config.states.IN_COURSE) {
-        if (newState !== config.states.DONE) {
-          throw new Error("Error: Can't update state");
-        }
-      }
-      break;
-
-    case config.types.LOAN:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          throw new Error("Error: Can't update state");
-        }
-      }
-
-      if (actualState === config.states.APPROVED) {
-        if (newState !== config.states.IN_COURSE) {
-          throw new Error("Error: Can't update state");
-        }
-      }
-
-      if (actualState === config.types.IN_COURSE) {
-        if (newState !== config.types.DONE) {
-          throw new Error("Error: Can't update state");
-        }
-      }
-      break;
-
-    default:
-      throw new Error('Error: Case not supported');
-  }
 };
 
 module.exports = {

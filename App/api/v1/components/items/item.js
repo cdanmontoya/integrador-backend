@@ -24,6 +24,21 @@ const get = async (id) => {
 
 const getAll = async () => Item.findAll();
 
+const checkState = (actualState, newState) => {
+  if (actualState === config.RESERVED) {
+    if (newState === config.NOT_AVAILABLE) {
+      return false;
+    }
+  }
+
+  if (actualState === config.IN_LOAN || actualState === config.NOT_AVAILABLE) {
+    if (newState !== config.AVAILABLE) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const update = async (queryID, body) => {
   const { name, typeID, statusID } = body;
 
@@ -32,44 +47,23 @@ const update = async (queryID, body) => {
   if (statusID) {
     const item = await get(queryID);
     const actualState = item.statusID;
+    const updateArgs = { name, typeID };
 
-    try {
-      checkState(actualState, statusID);
-      Item.update(
-        { name, typeID, statusID },
-        { where: { id: queryID } },
-      );
-      return;
-    } catch (err) {
-      throw err;
+    if (checkState(actualState, statusID)) {
+      updateArgs.statusID = statusID;
     }
-  }
 
-  // Otherwise, just update the item
-  Item.update(
-    { name, typeID },
-    { where: { id: queryID } },
-  );
+    Item.update(
+      updateArgs,
+      { where: { id: queryID } },
+    );
+  }
 };
 
 const remove = async (id) => {
   Item.destroy({
     where: { id },
   });
-};
-
-const checkState = (actualState, newState) => {
-  if (actualState === config.RESERVED) {
-    if (newState === config.NOT_AVAILABLE) {
-      throw new Error("Error: Can't change status");
-    }
-  }
-
-  if (actualState === config.IN_LOAN || actualState === config.NOT_AVAILABLE) {
-    if (newState !== config.AVAILABLE) {
-      throw new Error('Error: Can not change status');
-    }
-  }
 };
 
 module.exports = {

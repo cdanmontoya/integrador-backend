@@ -41,6 +41,26 @@ const getByRoom = async (params) => {
 
 const getAll = async () => Event.findAll();
 
+const checkState = (actualState, newState) => {
+  // If the actual state is 'confirmed', it just can change to 'canceled' or 'in course'
+  if (actualState === config.CONFIRMED) {
+    if (newState === 4) {
+      return false;
+    }
+  }
+
+  if (actualState === config.CANCELED || actualState === config.DONE) {
+    return false;
+  }
+
+  if (actualState === config.IN_COURSE) {
+    if (newState !== config.DONE) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const update = async (params, body) => {
   const {
     name, eventType, stateID, description, userID,
@@ -74,11 +94,8 @@ const update = async (params, body) => {
     const event = await get(eventID);
     const actualState = event.stateID;
 
-    try {
-      checkState(actualState, stateID);
+    if (checkState(actualState, stateID)) {
       updateArgs.stateID = stateID;
-    } catch (error) {
-      throw error;
     }
   }
 
@@ -88,24 +105,6 @@ const update = async (params, body) => {
   );
 };
 
-const checkState = (actualState, newState) => {
-  // If the actual state is 'confirmed', it just can change to 'canceled' or 'in course'
-  if (actualState === config.CONFIRMED) {
-    if (newState === 4) {
-      throw new Error("Error: Can't change status from 'confirmed to 'done'");
-    }
-  }
-
-  if (actualState === config.CANCELED || actualState === config.DONE) {
-    throw new Error("Error: Can not change status from 'canceled' or 'done'");
-  }
-
-  if (actualState === config.IN_COURSE) {
-    if (newState !== config.DONE) {
-      throw new Error("Error: Can not change status from 'in course' to another state");
-    }
-  }
-};
 
 const remove = async (id) => {
   Event.destroy({

@@ -1,7 +1,7 @@
-const express = require('express');
+const Express = require('express');
 const server = require('./config/server');
 
-const app = new express();
+const app = new Express();
 server(app);
 
 app.listen(app.get('port'), () => {

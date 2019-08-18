@@ -35,6 +35,22 @@ const getByAux = async (params) => {
 
 const getAll = async () => Turn.findAll();
 
+const checkState = (actualState, newState) => {
+  if (actualState === config.states.ASSIGNED) {
+    if (newState === config.states.DONE) {
+      return false;
+    }
+  }
+
+  if (actualState === config.states.IN_PROGRESS) {
+    if (newState !== config.states.DONE) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 const update = async (params, body) => {
   let { startTime, endTime } = body;
 
@@ -52,11 +68,8 @@ const update = async (params, body) => {
     const request = await get(turnID);
     const actualState = request.stateID;
 
-    try {
-      checkState(actualState, stateID);
+    if (checkState(actualState, stateID)) {
       updateArgs.stateID = stateID;
-    } catch (error) {
-      throw error;
     }
   }
 
@@ -70,20 +83,6 @@ const remove = async (id) => {
   Turn.destroy({
     where: { id },
   });
-};
-
-const checkState = (actualState, newState) => {
-  if (actualState === config.states.ASSIGNED) {
-    if (newState === config.states.DONE) {
-      throw new Error('Error: cannot update state from Assigned to Done');
-    }
-  }
-
-  if (actualState === config.states.IN_PROGRESS) {
-    if (newState !== config.states.DONE) {
-      throw new Error('Error: cannot update state');
-    }
-  }
 };
 
 module.exports = {
