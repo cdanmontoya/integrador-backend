@@ -23,6 +23,7 @@ const {
  * @param {*} app Basic Express app
  */
 const server = async (app) => {
+    app.disable('x-powered-by');
     app.set('port', port);
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
