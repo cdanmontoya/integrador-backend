@@ -40,14 +40,6 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: true,
     },
-    attendedBy: {
-      type: DataTypes.STRING(50),
-      allowNull: true,
-      references: {
-        model: 'user',
-        key: 'username',
-      },
-    },
     sectionalID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
@@ -89,7 +81,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true,
     },
   }, {
-    tableName: 'request',
+    tableName: 'Request',
     timestamps: false,
   });
 };

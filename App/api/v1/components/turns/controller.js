@@ -92,11 +92,17 @@ const update = async (req, res) => {
   const { turnID } = params;
   const turn = util.get(turnID);
 
-  if (!turn) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!turn) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .update(params, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.error(err);
 
@@ -112,7 +118,11 @@ const remove = async (req, res) => {
   const id = req.params.turnID;
   const event = util.get(id);
 
-  if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!event) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .remove(id)

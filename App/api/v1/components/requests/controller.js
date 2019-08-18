@@ -69,11 +69,17 @@ const update = async (req, res) => {
   const { requestID } = req.params;
 
   const request = await util.get(requestID);
-  if (!request) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!request) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .update(requestID, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
       .send({ message: 'Error', err }));
@@ -85,7 +91,11 @@ const remove = async (req, res) => {
   const { requestID } = req.params;
 
   const request = await util.get(requestID);
-  if (!request) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!request) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .remove(requestID)

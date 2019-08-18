@@ -1,19 +1,18 @@
 /* eslint-disable func-names */
 
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('event_type', {
+  return sequelize.define('turn_state', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
     },
-    type: {
+    description: {
       type: DataTypes.STRING(50),
-      allowNull: true,
+      allowNull: false,
     },
   }, {
-    tableName: 'Event_type',
+    tableName: 'Turn_state',
     timestamps: false,
   });
 };

@@ -17,7 +17,7 @@ module.exports = function (sequelize, DataTypes) {
       },
     },
   }, {
-    tableName: 'block',
+    tableName: 'Block',
     timestamps: false,
   });
 };

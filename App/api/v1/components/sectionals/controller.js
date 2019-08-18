@@ -66,11 +66,17 @@ const update = async (req, res) => {
   const id = req.params.sectionalID;
 
   const sectional = await util.get(id);
-  if (!sectional) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!sectional) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .update(id, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.error(err);
       return res
@@ -85,7 +91,11 @@ const remove = async (req, res) => {
   const id = req.params.sectionalID;
 
   const sectional = await util.get(id);
-  if (!sectional) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!sectional) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .remove(id)

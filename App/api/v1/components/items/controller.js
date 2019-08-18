@@ -33,7 +33,9 @@ const get = async (req, res) => {
     },
     (err) => {
       console.error(err);
-      return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Internal server error' });
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
     },
   );
 };
@@ -65,7 +67,9 @@ const update = async (req, res) => {
 
   await util
     .update(itemID, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.error(err);
       return res
@@ -104,7 +108,9 @@ const changeState = async (req, res) => {
 
   await util
     .changeState(params, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.log(err);
       return res

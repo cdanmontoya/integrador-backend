@@ -41,7 +41,7 @@ module.exports = function (sequelize, DataTypes) {
       },
     },
   }, {
-    tableName: 'rooms_per_logistic_unit',
+    tableName: 'Rooms_per_logistic_unit',
     timestamps: false,
   });
 };

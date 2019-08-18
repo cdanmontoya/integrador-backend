@@ -21,7 +21,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true,
     },
   }, {
-    tableName: 'sectional',
+    tableName: 'Sectional',
     timestamps: false,
   });
 };

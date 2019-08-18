@@ -66,14 +66,22 @@ const update = async (req, res) => {
   const { username } = req.params;
 
   const user = await util.get(username);
-  if (!user) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!user) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .update(username, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.error(err);
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Error' });
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
     });
   return true;
 };
@@ -82,7 +90,11 @@ const remove = async (req, res) => {
   const { username } = req.params;
 
   const user = await util.get(username);
-  if (!user) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found' });
+  if (!user) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
     .remove(username)
