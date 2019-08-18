@@ -38,7 +38,8 @@ module.exports = function (sequelize, DataTypes) {
       },
     },
   }, {
-    tableName: 'room',
+    tableName: 'Room',
     timestamps: false,
+
   });
 };

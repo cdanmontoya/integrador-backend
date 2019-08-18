@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true,
     },
   }, {
-    tableName: 'request_type',
+    tableName: 'Request_type',
     timestamps: false,
   });
 };

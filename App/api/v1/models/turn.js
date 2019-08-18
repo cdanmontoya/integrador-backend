@@ -19,6 +19,10 @@ module.exports = function (sequelize, DataTypes) {
     stateID: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
+      references: {
+        model: 'turn_state',
+        key: 'id',
+      },
     },
     auxiliarID: {
       type: DataTypes.STRING(50),
@@ -29,7 +33,7 @@ module.exports = function (sequelize, DataTypes) {
       },
     },
   }, {
-    tableName: 'turn',
+    tableName: 'Turn',
     timestamps: false,
   });
 };

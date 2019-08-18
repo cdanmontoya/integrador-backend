@@ -29,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
       },
     },
   }, {
-    tableName: 'turn_record',
+    tableName: 'Turn_record',
     timestamps: false,
   });
 };

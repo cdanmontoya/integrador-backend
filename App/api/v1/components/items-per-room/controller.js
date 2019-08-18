@@ -116,7 +116,9 @@ const update = async (req, res) => {
 
   await util
     .update(id, body)
-    .then(() => res.status(httpStatus.OK).send({ message: 'Updated' }))
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.error(err);
       return res

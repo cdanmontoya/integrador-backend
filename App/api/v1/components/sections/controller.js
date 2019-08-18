@@ -1,28 +1,11 @@
 const httpStatus = require('http-status');
-const util = require('./block');
+const util = require('./section');
 
 const create = async (req, res) => {
-  const sectional = req.params.sectionalID;
+  const { params } = req;
   const { body } = req;
 
-  await util.create(sectional, body).then(
-    () => res
-      .status(httpStatus.CREATED)
-      .send({ message: 'Created' }),
-    (err) => {
-      console.error(err);
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .send({ message: 'Error' });
-    },
-  );
-};
-
-const createMany = async (req, res) => {
-  const sectional = req.params.sectionalID;
-  const { body } = req;
-
-  await util.createMany(sectional, body).then(
+  await util.create(params, body).then(
     () => res
       .status(httpStatus.CREATED)
       .send({ message: 'Created' }),
@@ -36,10 +19,9 @@ const createMany = async (req, res) => {
 };
 
 const get = async (req, res) => {
-  const sectional = req.params.sectionalID;
-  const number = req.params.blockID;
+  const id = req.params.sectionID;
 
-  await util.get(sectional, number).then(
+  await util.get(id).then(
     (data) => {
       if (!data || data.length === 0) {
         return res
@@ -59,10 +41,10 @@ const get = async (req, res) => {
   );
 };
 
-const getBySectional = async (req, res) => {
-  const sectional = req.params.sectionalID;
+const getByLogisticUnit = async (req, res) => {
+  const { params } = req;
 
-  await util.getBySectional(sectional).then(
+  await util.getByLogisticUnit(params).then(
     (data) => {
       if (!data || data.length === 0) {
         return res
@@ -105,27 +87,47 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
   const { body } = req;
-  const sectional = req.params.sectionalID;
-  const number = req.params.blockID;
+  const { params } = req;
+
+  const { sectionID } = params;
+  const section = util.get(sectionID);
+
+  if (!section) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
-    .update(sectional, number, body)
+    .update(params, body)
     .then(() => res
-      .status(httpStatus.OK).send({ message: 'Updated' }))
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
     .catch((err) => {
       console.error(err);
+
       return res
         .status(httpStatus.INTERNAL_SERVER_ERROR)
-        .send({ message: 'Error' });
+        .send({ message: 'Error', err });
     });
+  return true;
 };
 
+
 const remove = async (req, res) => {
-  const sectional = req.params.sectionalID;
-  const number = req.params.blockID;
+  const { params } = req;
+
+  const { sectionID } = params;
+  const section = util.get(sectionID);
+
+  if (!section) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .send({ message: 'Not found' });
+  }
 
   await util
-    .remove(sectional, number)
+    .remove(sectionID)
     .then((removeResponse) => {
       if (removeResponse === 0) {
         return res
@@ -143,13 +145,13 @@ const remove = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
+  return true;
 };
 
 module.exports = {
   create,
-  createMany,
   get,
-  getBySectional,
+  getByLogisticUnit,
   getAll,
   update,
   remove,

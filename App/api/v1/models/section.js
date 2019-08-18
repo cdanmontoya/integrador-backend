@@ -16,8 +16,12 @@ module.exports = function (sequelize, DataTypes) {
         key: 'username',
       },
     },
+    name: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
   }, {
-    tableName: 'section',
+    tableName: 'Section',
     timestamps: false,
   });
 };

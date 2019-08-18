@@ -1,12 +1,14 @@
 const Sequelize = require('sequelize');
 
 const database = 'integrador';
-const username = 'root';
-const password = 'root';
+const username = 'admin'; // root
+const password = 'admintesting'; // root
+const host = 'integrador-db.crj2su2zgzdr.us-east-2.rds.amazonaws.com'; // localhost
+const dialect = 'mysql';
 
 const sequelize = new Sequelize(database, username, password, {
-  host: 'localhost',
-  dialect: 'mysql',
+  host,
+  dialect,
 });
 
 const db = {};

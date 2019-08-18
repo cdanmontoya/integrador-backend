@@ -73,7 +73,7 @@ module.exports = function (sequelize, DataTypes) {
       },
     },
   }, {
-    tableName: 'event',
+    tableName: 'Event',
     timestamps: false,
   });
 };

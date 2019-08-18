@@ -15,8 +15,10 @@ router.route('/:username')
 
 const rplu = require('../rooms-per-logistic-unit/route');
 const turns = require('../turns/route');
+const sections = require('../sections/route');
 
 router.use('/:username/rooms', rplu);
 router.use('/:username/turns', turns);
+router.use('/:username/sections', sections);
 
 module.exports = router;

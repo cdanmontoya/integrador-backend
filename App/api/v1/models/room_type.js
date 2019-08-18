@@ -17,7 +17,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true,
     },
   }, {
-    tableName: 'room_type',
+    tableName: 'Room_type',
     timestamps: false,
   });
 };

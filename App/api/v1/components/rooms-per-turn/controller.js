@@ -69,7 +69,9 @@ const remove = async (req, res) => {
   const { roomID } = req.query;
 
   if (!turnID || !sectionalID || !blockID || !roomID) {
-    return res.status(httpStatus.BAD_REQUEST).send({ message: 'Query parameters missing' });
+    return res
+      .status(httpStatus.BAD_REQUEST)
+      .send({ message: 'Query parameters missing' });
   }
 
   const rplu = await util.get(turnID, sectionalID, blockID, roomID);
