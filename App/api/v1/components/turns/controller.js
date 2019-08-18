@@ -1,4 +1,4 @@
-const util = require('./event');
+const util = require('./turn');
 const httpStatus = require('http-status');
 
 const create = async (req, res) => {
@@ -21,7 +21,7 @@ const create = async (req, res) => {
 };
 
 const get = async (req, res) => {
-    let id = req.params.eventID;
+    let id = req.params.turnID;
 
     await util.get(id).then(
         (data) => {
@@ -44,10 +44,10 @@ const get = async (req, res) => {
     );
 };
 
-const getByRoom = async (req, res) => {
+const getByAux = async (req, res) => {
     let params = req.params;
 
-    await util.getByRoom(params).then(
+    await util.getByAux(params).then(
         (data) => {
             if (!data || data.length == 0) {
                 return res
@@ -94,10 +94,10 @@ const update = async (req, res) => {
     let body = req.body;
     let params = req.params;
 
-    let eventID = params.eventID;
-    let event = util.get(eventID);
+    let turnID = params.turnID;
+    let turn = util.get(turnID);
 
-    if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
+    if (!turn) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
 
     await util
         .update(params, body)
@@ -105,14 +105,17 @@ const update = async (req, res) => {
             return res.status(httpStatus.OK).send({ message: 'Updated'});
         })
         .catch((err) => {
+            console.error(err);
+            
             return res
                 .status(httpStatus.INTERNAL_SERVER_ERROR)
                 .send({ message: 'Error', err });
         });
 };
 
+
 const remove = async (req, res) => {
-    let id = req.params.eventID;
+    let id = req.params.turnID;
     let event = util.get(id);
 
     if (!event) return res.status(httpStatus.NOT_FOUND).send({ message: 'Not found'});
@@ -141,7 +144,7 @@ const remove = async (req, res) => {
 module.exports = {
     create,
     get,
-    getByRoom,
+    getByAux,
     getAll,
     update,
     remove

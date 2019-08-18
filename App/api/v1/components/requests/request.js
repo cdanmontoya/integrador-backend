@@ -67,11 +67,7 @@ const update = async (id, body) => {
 
 const remove = async (id) => {
 
-    Request.destroy({ where: { id } })
-    // const query = `DELETE FROM Request WHERE id = '${id}'`;
-
-    // let res = await sequelize.query(query);
-    // return res[0].affectedRows;
+    Request.destroy({ where: { id } });
 }
 
 const checkState = (requestType, actualState, newState) => {
