@@ -6,7 +6,7 @@ const controller = require('./controller');
 
 router.route('/')
   .post((req, res) => controller.create(req, res))
-  .get((req, res) => controller.getByAux(req, res));
+  .get((req, res) => controller.getByAuxSwitcher(req, res));
 
 router.route('/:turnID')
   .get((req, res) => controller.get(req, res))

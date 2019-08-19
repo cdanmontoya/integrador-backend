@@ -64,6 +64,43 @@ const getByAux = async (req, res) => {
   );
 };
 
+const getByAuxForCalendar = async (req, res) => {
+  const { params } = req;
+
+  await util.getByAuxForCalendar(params).then(
+    (data) => {
+      if (!data || data.length === 0) {
+        return res
+          .status(httpStatus.NO_CONTENT)
+          .send({ message: 'No content' });
+      }
+      return res
+        .status(httpStatus.OK)
+        .send(data);
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
+    },
+  );
+};
+
+const getByAuxSwitcher = async (req, res) => {
+  const { format } = req.query;
+
+  switch (format) {
+    case 'calendar':
+      await getByAuxForCalendar(req, res);
+      break;
+
+    default:
+      await getByAux(req, res);
+      break;
+  }
+};
+
 const getAll = async (req, res) => {
   await util.getAll().then(
     (data) => {
@@ -150,6 +187,8 @@ module.exports = {
   create,
   get,
   getByAux,
+  getByAuxForCalendar,
+  getByAuxSwitcher,
   getAll,
   update,
   remove,
