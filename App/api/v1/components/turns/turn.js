@@ -49,11 +49,6 @@ const getByAuxForCalendar = async (params) => {
     order: [['startTime', 'ASC']],
   });
 
-  turns.forEach((turn) => {
-    turn.dataValues.startTime.setHours(turn.dataValues.startTime.getHours() - 10);
-    turn.dataValues.endTime.setHours(turn.dataValues.endTime.getHours() - 10);
-  });
-
   turns = JSON.parse(JSON.stringify(turns));
   turns = await config.extract(turns);
 
