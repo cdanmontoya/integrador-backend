@@ -2,19 +2,25 @@ const config = require('./config');
 const db = require('../../../../../config/database');
 
 let Turn = require('../../models/turn');
+let Section = require('../../models/section');
 
 Turn = Turn(db.sequelize, db.Sequelize);
+Section = Section(db.sequelize, db.Sequelize);
+
+Section.hasMany(Turn, { foreignKey: 'sectionID' });
+Turn.belongsTo(Section, { foreignKey: 'sectionID' });
+
 
 const create = async (params, body) => {
   let { startTime, endTime } = body;
-  const { stateID } = body;
+  const { stateID, sectionID } = body;
   const { username } = params;
 
   startTime = new Date(startTime);
   endTime = new Date(endTime);
 
   Turn.create({
-    startTime, endTime, stateID, auxiliarID: username,
+    startTime, endTime, stateID, auxiliarID: username, sectionID,
   });
 };
 
@@ -31,6 +37,22 @@ const getByAux = async (params) => {
   return Turn.findAll({
     where: { auxiliarID: username },
   });
+};
+
+const getByAuxForCalendar = async (params) => {
+  const { username } = params;
+
+  let turns = await Turn.findAll({
+    attributes: ['id', 'startTime', 'endTime', 'auxiliarID'],
+    include: [{ model: Section, required: true }],
+    where: { auxiliarID: username },
+    order: [['startTime', 'ASC']],
+  });
+
+  turns = JSON.parse(JSON.stringify(turns));
+  turns = await config.extract(turns);
+
+  return turns;
 };
 
 const getAll = async () => Turn.findAll();
@@ -89,6 +111,7 @@ module.exports = {
   create,
   get,
   getByAux,
+  getByAuxForCalendar,
   getAll,
   update,
   remove,

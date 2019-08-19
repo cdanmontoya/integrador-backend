@@ -32,6 +32,14 @@ module.exports = function (sequelize, DataTypes) {
         key: 'username',
       },
     },
+    sectionID: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
+      references: {
+        model: 'section',
+        key: 'id',
+      },
+    },
   }, {
     tableName: 'Turn',
     timestamps: false,
