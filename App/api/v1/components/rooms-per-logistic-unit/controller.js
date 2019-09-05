@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const util = require('./roomsPerLogisticUnit');
+const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
   const { body } = req;

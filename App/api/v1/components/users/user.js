@@ -62,6 +62,15 @@ const isAssistant = async (username) => {
   return user.userType === config.ASSISTANT;
 };
 
+const isSystemAdmin = async (username) => {
+  const user = await get(username);
+  if (!user) {
+    return false;
+  }
+  return user.userType === config.SYSTEM_ADMIN;
+};
+
+
 module.exports = {
   create,
   get,
@@ -70,4 +79,5 @@ module.exports = {
   remove,
   isAdmin,
   isAssistant,
+  isSystemAdmin,
 };

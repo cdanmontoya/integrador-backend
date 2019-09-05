@@ -1,7 +1,7 @@
 /**
  * Server configuration
  */
-const port = process.env.DEV ?  5000 : process.env.PORT;
+const port = process.env.DEV ? 5000 : 5000;
 
 const morganMode = process.env.DEV ? 'dev' : 'tiny';
 
