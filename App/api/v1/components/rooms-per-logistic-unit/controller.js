@@ -3,6 +3,10 @@ const util = require('./roomsPerLogisticUnit');
 const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresSystemAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const { body } = req;
   const { params } = req;
 
@@ -17,9 +21,14 @@ const create = async (req, res) => {
         .send({ message: err });
     },
   );
+  return true;
 };
 
 const get = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const { rpluID } = req.params;
 
   await util.get(rpluID).then(
@@ -40,9 +49,14 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
+  return true;
 };
 
 const getUnsupervisedRooms = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   await util.getUnsupervisedRooms().then(
     (data) => {
       if (data.length > 0) {
@@ -61,9 +75,14 @@ const getUnsupervisedRooms = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
+  return true;
 };
 
 const getByLogisticUnit = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const logisticUnit = req.params.username;
 
   await util.getByLogisticUnit(logisticUnit).then(
@@ -84,9 +103,14 @@ const getByLogisticUnit = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
+  return true;
 };
 
 const getAll = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -105,9 +129,14 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
+  return true;
 };
 
 const remove = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresSystemAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const { rpluID } = req.params;
 
   const rplu = await util.get(rpluID);

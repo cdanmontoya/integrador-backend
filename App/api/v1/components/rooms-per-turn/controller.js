@@ -3,6 +3,10 @@ const util = require('./roomsPerTurn');
 const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const { body } = req;
   const { params } = req;
 
@@ -17,9 +21,17 @@ const create = async (req, res) => {
         .send({ message: err });
     },
   );
+  return true;
 };
 
 const getByTurn = async (req, res) => {
+  const idToken = req.get('idToken');
+  const authAssistant = await authorization.requiresAssistant(idToken);
+  const authAdmin = await authorization.requiresAdmin(idToken);
+
+  // If the event is not created by admin nor an assistant, the request must be rejected
+  if (!authAssistant && !authAdmin) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const { turnID } = req.params;
 
   await util.getByTurn(turnID).then(
@@ -40,9 +52,17 @@ const getByTurn = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
+  return true;
 };
 
 const getAll = async (req, res) => {
+  const idToken = req.get('idToken');
+  const authAssistant = await authorization.requiresAssistant(idToken);
+  const authAdmin = await authorization.requiresAdmin(idToken);
+
+  // If the event is not created by admin nor an assistant, the request must be rejected
+  if (!authAssistant && !authAdmin) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -61,9 +81,14 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
+  return true;
 };
 
 const remove = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   const { turnID } = req.query;
   const { sectionalID } = req.query;
   const { blockID } = req.query;
