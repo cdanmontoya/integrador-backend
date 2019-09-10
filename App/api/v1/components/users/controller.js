@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const util = require('./user');
+const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
   const { body } = req;
@@ -15,10 +16,14 @@ const create = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
+  return true;
 };
 
 const get = async (req, res) => {
   const { username } = req.params;
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   await util.get(username).then(
     (data) => {
@@ -38,9 +43,14 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
+  return true;
 };
 
 const getAll = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -59,11 +69,16 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
+  return true;
 };
 
 const update = async (req, res) => {
   const { body } = req;
   const { username } = req.params;
+
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   const user = await util.get(username);
   if (!user) {
@@ -88,6 +103,10 @@ const update = async (req, res) => {
 
 const remove = async (req, res) => {
   const { username } = req.params;
+
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   const user = await util.get(username);
   if (!user) {
