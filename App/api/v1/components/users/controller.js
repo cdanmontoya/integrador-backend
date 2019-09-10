@@ -128,6 +128,34 @@ const remove = async (req, res) => {
     });
   return true;
 };
+const getAssistants = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresAdmin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
+  // Unsafe line, must be taken from token
+  const logisticUnit = req.params.username;
+
+  await util.getAssistants(logisticUnit).then(
+    (data) => {
+      if (data.length > 0) {
+        return res
+          .status(httpStatus.OK)
+          .send(data);
+      }
+      return res
+        .status(httpStatus.NO_CONTENT)
+        .send({ message: 'No data found' });
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
+    },
+  );
+  return true;
+};
 
 module.exports = {
   create,
@@ -135,4 +163,5 @@ module.exports = {
   getAll,
   update,
   remove,
+  getAssistants,
 };
