@@ -7,7 +7,7 @@
     "lint": "eslint ./ --fix",
     "start": "node app.js",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage && ./node_modules/.bin/codecov -t 25c7d18c-cae9-4391-b4af-36b888933355"
   },
   "repository": {
     "type": "git",
