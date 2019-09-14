@@ -1,12 +1,16 @@
 const db = require('../../../../../config/database');
+let ItemsPerRequest = require('../../models/items_per_request');
 
-const { sequelize } = db;
+ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
 
 const create = async (requestID, body) => {
-  const query = `INSERT INTO Items_per_request (requestID, itemType, quantity) VALUES
-        ('${requestID}', '${body.itemType}','${body.quantity}')`;
+  const { itemType, quantity } = body;
 
-  await sequelize.query(query);
+  ItemsPerRequest.create({
+    requestID,
+    itemType,
+    quantity,
+  });
 };
 
 const createMany = async (requestID, items) => {
@@ -16,37 +20,30 @@ const createMany = async (requestID, items) => {
 };
 
 const get = async (params) => {
-  const query = `SELECT * FROM Items_per_request WHERE requestID = '${params.requestID}' AND itemType = '${params.itemType}'`;
-
-  let data = await sequelize.query(query);
-  data = JSON.parse(JSON.stringify(data[0]));
-
-  return data[0];
+  const { requestID, itemType } = params;
+  return ItemsPerRequest.findAll({
+    where: { requestID, itemType },
+  });
 };
 
 const getByRequest = async (params) => {
-  const query = `SELECT * FROM Items_per_request WHERE requestID = '${params.requestID}'`;
-
-  let data = await sequelize.query(query);
-  data = JSON.parse(JSON.stringify(data[0]));
-
-  return data;
+  const { requestID } = params;
+  return ItemsPerRequest.findAll({
+    where: { requestID },
+  });
 };
 
-const getAll = async () => {
-  const query = 'SELECT * FROM Items_per_room';
-
-  let data = await sequelize.query(query);
-  data = JSON.parse(JSON.stringify(data[0]));
-
-  return data;
-};
+const getAll = async () => ItemsPerRequest.findAll();
 
 const remove = async (params) => {
-  const query = `DELETE FROM Items_per_room WHERE requestID = '${params.requestID}' AND itemType = '${params.itemType}'`;
+  const { requestID, itemType } = params;
 
-  const res = await sequelize.query(query);
-  return res[0].affectedRows;
+  ItemsPerRequest.destroy({
+    where: {
+      requestID,
+      itemType,
+    },
+  });
 };
 
 module.exports = {

@@ -54,6 +54,35 @@ const get = async (req, res) => {
   return true;
 };
 
+const getByUser = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
+  const { username } = req.params;
+
+  await util.getByUser(username).then(
+    (data) => {
+      console.log(data);
+      if (!data || data.length === 0) {
+        return res
+          .status(httpStatus.NOT_FOUND)
+          .send({ message: 'Not found' });
+      }
+      return res
+        .status(httpStatus.OK)
+        .send(data);
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
+    },
+  );
+  return true;
+};
+
 const getAll = async (req, res) => {
   const idToken = req.get('idToken');
   const auth = await authorization.requiresLogin(idToken);
@@ -146,6 +175,7 @@ const remove = async (req, res) => {
 module.exports = {
   create,
   get,
+  getByUser,
   getAll,
   update,
   remove,
