@@ -13,6 +13,9 @@ router.route('/:requestID')
   .put((req, res) => controller.update(req, res))
   .delete((req, res) => controller.remove(req, res));
 
+router.route('/user/:username')
+  .get((req, res) => controller.getByUser(req, res));
+
 const items = require('../items-per-request/route');
 
 router.use('/:requestID/items', items);

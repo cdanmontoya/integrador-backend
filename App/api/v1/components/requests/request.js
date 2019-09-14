@@ -1,11 +1,31 @@
 const config = require('./config');
 const db = require('../../../../../config/database');
+const itemsPerRequest = require('../items-per-request/itemsPerRequest');
+const RequestRecord = require('./request-record');
 
 let Request = require('../../models/request');
+let RequestType = require('../../models/request_type');
 
 Request = Request(db.sequelize, db.Sequelize);
+RequestType = RequestType(db.sequelize, db.Sequelize);
 
-const itemsPerRequest = require('../items-per-request/itemsPerRequest');
+RequestType.hasMany(Request, { foreignKey: 'requestType' });
+Request.belongsTo(RequestType, { foreignKey: 'requestType' });
+
+
+// Section.hasMany(Turn, { foreignKey: 'sectionID' });
+// Turn.belongsTo(Section, { foreignKey: 'sectionID' });
+
+// User.belongsTo(UsersContactsLists, {targetKey:'mobileNumber',foreignKey: 'mobileNumber'});
+// then you can use this :
+
+// User.findAll({
+// include: [{
+//     model: UsersContactsLists,
+//     where: {
+//         userId: 1
+//     }
+// }]
 
 const create = async (body) => {
   let {
@@ -31,9 +51,10 @@ const create = async (body) => {
     roomID,
     startTime,
     endTime,
-  }).then((request) => {
+  }).then(async (request) => {
     const requestID = request.dataValues.id;
-    itemsPerRequest.createMany(requestID, items);
+    await itemsPerRequest.createMany(requestID, items);
+    await RequestRecord.onUpdate(requestID, 'Created', createdBy, 1);
   });
 };
 
@@ -42,7 +63,13 @@ const get = async (id) => {
   return data[0];
 };
 
-const getAll = async () => Request.findAll();
+const getByUser = async (username) => Request.findAll({
+  where: { createdBy: username },
+  include: [{ model: RequestType }],
+  order: [['startTime', 'ASC']],
+});
+
+const getAll = async () => Request.findAll({ order: [['startTime', 'ASC']] });
 
 const checkState = (requestType, actualState, newState) => {
   if (actualState === config.states.CANCELED || actualState === config.states.REJECTED
@@ -152,4 +179,5 @@ module.exports = {
   getAll,
   update,
   remove,
+  getByUser,
 };
