@@ -12,21 +12,6 @@ RequestType = RequestType(db.sequelize, db.Sequelize);
 RequestType.hasMany(Request, { foreignKey: 'requestType' });
 Request.belongsTo(RequestType, { foreignKey: 'requestType' });
 
-
-// Section.hasMany(Turn, { foreignKey: 'sectionID' });
-// Turn.belongsTo(Section, { foreignKey: 'sectionID' });
-
-// User.belongsTo(UsersContactsLists, {targetKey:'mobileNumber',foreignKey: 'mobileNumber'});
-// then you can use this :
-
-// User.findAll({
-// include: [{
-//     model: UsersContactsLists,
-//     where: {
-//         userId: 1
-//     }
-// }]
-
 const create = async (body) => {
   let {
     startTime, endTime,
