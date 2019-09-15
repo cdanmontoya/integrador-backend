@@ -16,8 +16,7 @@ const login = async (idToken) => {
       email,
       userType: 1,
     };
-    User.create(newUser);
-    return newUser;
+    User.create(newUser).then((response) => response);
   }
   return user.dataValues;
 };
