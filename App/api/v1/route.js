@@ -2,7 +2,7 @@ const { Router } = require('express');
 
 const router = new Router();
 
-/**
+/*
  * References to each resource routers
  */
 const users = require('./components/users/route');
