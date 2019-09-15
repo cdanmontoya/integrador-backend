@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const util = require('./user');
 const authorization = require('../../../../services/authorization/authorization');
+const admin = require('../../../../../config/login/login');
 
 const create = async (req, res) => {
   const { body } = req;
@@ -131,12 +132,13 @@ const remove = async (req, res) => {
 const getAssistants = async (req, res) => {
   const idToken = req.get('idToken');
   const auth = await authorization.requiresAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+  const decodedToken = await admin.auth().verifyIdToken(idToken);
+  const username = decodedToken.email.split('@')[0];
 
-  // Unsafe line, must be taken from token
-  const logisticUnit = req.params.username;
+  if (!auth || username !== req.params.username) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
-  await util.getAssistants(logisticUnit).then(
+  // get assistants of a Logistic Unit
+  await util.getAssistants(username).then(
     (data) => {
       if (data.length > 0) {
         return res
