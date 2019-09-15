@@ -46,6 +46,8 @@ const remove = async (username) => {
   });
 };
 
+const getAssistants = async (logisticUnit) => User.findAll({ where: { logisticUnit } });
+
 const isAdmin = async (username) => {
   const user = await get(username);
   if (!user) {
@@ -75,6 +77,7 @@ module.exports = {
   create,
   get,
   getAll,
+  getAssistants,
   update,
   remove,
   isAdmin,
