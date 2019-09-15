@@ -5,12 +5,17 @@ const RequestRecord = require('./request-record');
 
 let Request = require('../../models/request');
 let RequestType = require('../../models/request_type');
+let ItemsPerRequest = require('../../models/items_per_request');
 
 Request = Request(db.sequelize, db.Sequelize);
 RequestType = RequestType(db.sequelize, db.Sequelize);
+ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
+
 
 RequestType.hasMany(Request, { foreignKey: 'requestType' });
 Request.belongsTo(RequestType, { foreignKey: 'requestType' });
+Request.hasMany(ItemsPerRequest, { foreignKey: 'requestID' });
+ItemsPerRequest.belongsTo(Request, { foreignKey: 'requestID' });
 
 const create = async (body) => {
   let {
@@ -44,17 +49,33 @@ const create = async (body) => {
 };
 
 const get = async (id) => {
-  const data = await Request.findAll({ where: { id } });
+  const data = await Request.findAll({
+    where: { id },
+    include: [
+      { model: RequestType },
+      { model: ItemsPerRequest },
+    ],
+    order: [['startTime', 'DESC']],
+  });
   return data[0];
 };
 
 const getByUser = async (username) => Request.findAll({
   where: { createdBy: username },
-  include: [{ model: RequestType }],
-  order: [['startTime', 'ASC']],
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+  ],
+  order: [['startTime', 'DESC']],
 });
 
-const getAll = async () => Request.findAll({ order: [['startTime', 'ASC']] });
+const getAll = async () => Request.findAll({
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
 const checkState = (requestType, actualState, newState) => {
   if (actualState === config.states.CANCELED || actualState === config.states.REJECTED
