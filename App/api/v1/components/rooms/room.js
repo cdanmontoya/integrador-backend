@@ -44,8 +44,8 @@ const getAvailableRooms = async (startTime, endTime) => {
   const newEndTime = new Date(endTime);
 
   const query = `select jeje.id as roomID, jeje.blockID, jeje.sectionalID, jeje.capacity, jeje.type  
-        from room as jeje left join 
-        (select r.id, r.blockID, r.sectionalID from event as e inner join room as r on r.id = e.roomID and r.blockID = e.blockID and r.sectionalID = e.sectionalID where (e.startTime between '${newStartTime}' and '${newEndTime}')  or (e.endTime between '${newStartTime}' and '${newEndTime}')) as result
+        from Room as jeje left join 
+        (select r.id, r.blockID, r.sectionalID from Event as e inner join Room as r on r.id = e.roomID and r.blockID = e.blockID and r.sectionalID = e.sectionalID where (e.startTime between '${newStartTime}' and '${newEndTime}')  or (e.endTime between '${newStartTime}' and '${newEndTime}')) as result
         on jeje.id = result.id and jeje.blockID = result.blockID and result.sectionalID = jeje.sectionalID where result.id is null;`;
 
   let data = await db.sequelize.query(query);
