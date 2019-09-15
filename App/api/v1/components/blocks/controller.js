@@ -1,14 +1,9 @@
 const httpStatus = require('http-status');
 const util = require('./block');
-const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
   const sectional = req.params.sectionalID;
   const { body } = req;
-
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   await util.create(sectional, body).then(
     () => res
@@ -21,16 +16,11 @@ const create = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const createMany = async (req, res) => {
   const sectional = req.params.sectionalID;
   const { body } = req;
-
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   await util.createMany(sectional, body).then(
     () => res
@@ -43,14 +33,9 @@ const createMany = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const get = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const number = req.params.blockID;
 
@@ -72,14 +57,9 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getBySectional = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
 
   await util.getBySectional(sectional).then(
@@ -100,13 +80,9 @@ const getBySectional = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getAll = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -125,14 +101,9 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const update = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
   const sectional = req.params.sectionalID;
   const number = req.params.blockID;
@@ -147,14 +118,9 @@ const update = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
-  return true;
 };
 
 const remove = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const number = req.params.blockID;
 
@@ -177,7 +143,6 @@ const remove = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
-  return true;
 };
 
 module.exports = {

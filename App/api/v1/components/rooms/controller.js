@@ -1,12 +1,7 @@
 const httpStatus = require('http-status');
 const util = require('./room');
-const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const block = req.params.blockID;
   const { body } = req;
@@ -22,14 +17,9 @@ const create = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const createMany = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const block = req.params.blockID;
 
@@ -46,14 +36,9 @@ const createMany = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const get = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const number = req.params.blockID;
   const id = req.params.roomID;
@@ -76,14 +61,9 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getByBlock = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const block = req.params.blockID;
 
@@ -105,14 +85,9 @@ const getByBlock = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getAvailableRooms = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { startTime } = req.body;
   const { endTime } = req.body;
 
@@ -134,14 +109,9 @@ const getAvailableRooms = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const getAll = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -160,14 +130,9 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const update = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
   const sectional = req.params.sectionalID;
   const number = req.params.blockID;
@@ -184,14 +149,9 @@ const update = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
-  return true;
 };
 
 const remove = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const sectional = req.params.sectionalID;
   const number = req.params.blockID;
   const id = req.params.roomID;
@@ -215,7 +175,6 @@ const remove = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
-  return true;
 };
 
 module.exports = {
