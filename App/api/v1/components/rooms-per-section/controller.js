@@ -29,9 +29,9 @@ const get = async (req, res) => {
   const auth = await authorization.requiresLogin(idToken);
   if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
-  const { rpluID } = req.params;
+  const { rpsID } = req.params;
 
-  await util.get(rpluID).then(
+  await util.get(rpsID).then(
     (data) => {
       if (!data || data.length === 0) {
         return res
@@ -111,9 +111,9 @@ const remove = async (req, res) => {
   const auth = await authorization.requiresAdmin(idToken);
   if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
-  const { rpluID } = req.params;
+  const { rpsID } = req.params;
 
-  const rplu = await util.get(rpluID);
+  const rplu = await util.get(rpsID);
   if (!rplu) {
     return res
       .status(httpStatus.NOT_FOUND)
@@ -121,7 +121,7 @@ const remove = async (req, res) => {
   }
 
   await util
-    .remove(rpluID)
+    .remove(rpsID)
     .then(() => res
       .status(httpStatus.OK)
       .send({ message: 'Removed successfully' }))
