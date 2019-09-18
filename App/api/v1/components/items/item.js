@@ -26,6 +26,18 @@ const get = async (id) => {
 
 const getTypes = async () => ItemTypes.findAll();
 
+const getFormatedTypes = async () => {
+  const data = await getTypes();
+  const response = { itemTypes: [] };
+
+  data.forEach((element) => {
+    const formatedDescription = `${element.id}. ${element.description}`;
+    response.itemTypes.push(formatedDescription);
+  });
+
+  return response;
+};
+
 const getAll = async () => Item.findAll();
 
 const checkState = (actualState, newState) => {
@@ -74,6 +86,7 @@ module.exports = {
   create,
   get,
   getTypes,
+  getFormatedTypes,
   getAll,
   update,
   remove,
