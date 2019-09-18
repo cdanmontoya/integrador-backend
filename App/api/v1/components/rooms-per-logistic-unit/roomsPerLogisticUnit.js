@@ -4,8 +4,8 @@ let RoomsPerLogisticUnit = require('../../models/rooms_per_logistic_unit');
 RoomsPerLogisticUnit = RoomsPerLogisticUnit(db.sequelize, db.Sequelize);
 
 const getUnsupervisedRooms = async () => {
-  const query = `SELECT room.id AS roomID, room.blockID, room.sectionalID, room.capacity, room.type 
-        FROM room LEFT JOIN rooms_per_logistic_unit AS rplu ON room.sectionalID = rplu.sectionalID AND room.blockID = rplu.blockID AND room.id = rplu.roomID 
+  const query = `SELECT Room.id AS roomID, Room.blockID, Room.sectionalID, Room.capacity, Room.type 
+        FROM Room LEFT JOIN Rooms_per_Logistic_Unit AS rplu ON Room.sectionalID = rplu.sectionalID AND Room.blockID = rplu.blockID AND Room.id = rplu.roomID 
         WHERE rplu.id IS NULL;`;
 
   let data = await db.sequelize.query(query);
