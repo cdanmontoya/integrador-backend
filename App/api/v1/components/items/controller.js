@@ -103,6 +103,42 @@ const getTypes = async (req, res) => {
   return true;
 };
 
+const getFormatedTypes = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
+  await util.getFormatedTypes().then(
+    (data) => {
+      if (data) {
+        return res
+          .status(httpStatus.OK)
+          .send(data);
+      }
+      return res
+        .status(httpStatus.NO_CONTENT)
+        .send({ message: 'No data found' });
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
+    },
+  );
+  return true;
+};
+
+const getTypesSwitcher = async (req, res) => {
+  const { format } = req.query;
+
+  if (format === 'true') {
+    await getFormatedTypes(req, res);
+  } else {
+    await getTypes(req, res);
+  }
+};
+
 const update = async (req, res) => {
   const idToken = req.get('idToken');
   const authAssistant = await authorization.requiresAssistant(idToken);
@@ -160,7 +196,7 @@ const remove = async (req, res) => {
 module.exports = {
   create,
   get,
-  getTypes,
+  getTypesSwitcher,
   getAll,
   update,
   remove,

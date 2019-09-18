@@ -9,7 +9,7 @@ router.route('/')
   .get((req, res) => controller.getAll(req, res));
 
 router.route('/types')
-  .get((req, res) => controller.getTypes(req, res));
+  .get((req, res) => controller.getTypesSwitcher(req, res));
 
 router.route('/:itemID')
   .get((req, res) => controller.get(req, res))
