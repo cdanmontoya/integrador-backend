@@ -81,7 +81,6 @@ const getTypes = async (req, res) => {
   // const idToken = req.get('idToken');
   // const auth = await authorization.requiresLogin(idToken);
   // if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   await util.getTypes().then(
     (data) => {
       if (data.length > 0) {
