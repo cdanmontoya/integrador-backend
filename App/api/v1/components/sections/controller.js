@@ -4,7 +4,7 @@ const authorization = require('../../../../services/authorization/authorization'
 
 const create = async (req, res) => {
   const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
+  const auth = await authorization.requiresAdmin(idToken);
   if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   const { params } = req;
