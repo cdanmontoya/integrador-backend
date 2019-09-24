@@ -14,7 +14,7 @@ router.route('/:requestID')
   .delete((req, res) => controller.remove(req, res));
 
 router.route('/user/:username')
-  .get((req, res) => controller.getByUser(req, res));
+  .get((req, res) => controller.getByUserSwitcher(req, res));
 
 const items = require('../items-per-request/route');
 
