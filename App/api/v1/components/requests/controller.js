@@ -11,7 +11,6 @@ const create = async (req, res) => {
 
   await util.create(body).then(
     (request) => {
-      console.log(request);
       return res
         .status(httpStatus.CREATED)
         .send({ message: 'Created', request });
@@ -54,6 +53,7 @@ const get = async (req, res) => {
   return true;
 };
 
+
 const getByUser = async (req, res) => {
   const idToken = req.get('idToken');
   const auth = await authorization.requiresLogin(idToken);
@@ -63,7 +63,6 @@ const getByUser = async (req, res) => {
 
   await util.getByUser(username).then(
     (data) => {
-      console.log(data);
       if (!data || data.length === 0) {
         return res
           .status(httpStatus.NOT_FOUND)
@@ -81,6 +80,82 @@ const getByUser = async (req, res) => {
     },
   );
   return true;
+};
+
+const getActiveRequestByUser = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
+  const { username } = req.params;
+
+  await util.getActiveRequestByUser(username).then(
+    (data) => {
+      if (!data || data.length === 0) {
+        return res
+          .status(httpStatus.NOT_FOUND)
+          .send({ message: 'Not found' });
+      }
+      return res
+        .status(httpStatus.OK)
+        .send(data);
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
+    },
+  );
+  return true;
+};
+
+const getRequestRecordByUser = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
+  const { username } = req.params;
+
+  await util.getRequestRecordByUser(username).then(
+    (data) => {
+      if (!data || data.length === 0) {
+        return res
+          .status(httpStatus.NOT_FOUND)
+          .send({ message: 'Not found' });
+      }
+      return res
+        .status(httpStatus.OK)
+        .send(data);
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Internal server error' });
+    },
+  );
+  return true;
+};
+
+const getByUserSwitcher = async (req, res) => {
+  const { active } = req.query;
+  console.log(active)
+
+  switch (active) {
+    case 'true':
+      await getActiveRequestByUser(req, res);
+      break;
+
+    case 'false':
+      console.log('jeje, trying to get record')
+      await getRequestRecordByUser(req, res);
+      break;
+
+    default:
+      await getByUser(req, res);
+      break;
+  }
 };
 
 const getAll = async (req, res) => {
@@ -175,7 +250,7 @@ const remove = async (req, res) => {
 module.exports = {
   create,
   get,
-  getByUser,
+  getByUserSwitcher,
   getAll,
   update,
   remove,

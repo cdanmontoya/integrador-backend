@@ -27,6 +27,7 @@
   "homepage": "https://github.com/cdanmontoya/integrador-backend#readme",
   "devDependencies": {
     "@types/express": "^4.17.0",
+    "@types/firebase": "^3.2.1",
     "@types/jest": "^24.0.18",
     "@types/sequelize": "^4.28.4",
     "eslint": "^6.1.0",

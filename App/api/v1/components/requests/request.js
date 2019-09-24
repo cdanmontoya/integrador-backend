@@ -1,7 +1,9 @@
-const config = require('./config');
+const { checkState } = require('./config');
 const db = require('../../../../../config/database');
 const itemsPerRequest = require('../items-per-request/itemsPerRequest');
 const RequestRecord = require('./request-record');
+
+const { Op } = db.Sequelize;
 
 let Request = require('../../models/request');
 let RequestType = require('../../models/request_type');
@@ -69,7 +71,13 @@ const getByUser = async (username) => Request.findAll({
   order: [['startTime', 'DESC']],
 });
 
-const getAll = async () => Request.findAll({
+const getActiveRequestByUser = async (username) => Request.findAll({
+  where: {
+    createdBy: username,
+    stateID: {
+      [Op.or]: [1, 4, 5],
+    },
+  },
   include: [
     { model: RequestType },
     { model: ItemsPerRequest },
@@ -77,70 +85,27 @@ const getAll = async () => Request.findAll({
   order: [['startTime', 'DESC']],
 });
 
-const checkState = (requestType, actualState, newState) => {
-  if (actualState === config.states.CANCELED || actualState === config.states.REJECTED
-    || actualState === config.states.DONE) {
-    return false;
-  }
+const getRequestRecordByUser = async (username) => Request.findAll({
+  where: {
+    createdBy: username,
+    stateID: {
+      [Op.or]: [2, 3, 6],
+    },
+  },
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
-  switch (requestType) {
-    case config.types.RESERVE:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return true;
-        }
-        return false;
-      }
-
-      if (actualState === config.states.APPROVED) {
-        if (newState !== config.states.CANCELED) {
-          return false;
-        }
-      }
-      break;
-
-    case config.types.ASSISTANCE:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.IN_COURSE && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return false;
-        }
-      }
-
-      if (actualState === config.states.IN_COURSE) {
-        if (newState !== config.states.DONE) {
-          return false;
-        }
-      }
-      break;
-
-    case config.types.LOAN:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return false;
-        }
-      }
-
-      if (actualState === config.states.APPROVED) {
-        if (newState !== config.states.IN_COURSE) {
-          return false;
-        }
-      }
-
-      if (actualState === config.types.IN_COURSE) {
-        if (newState !== config.types.DONE) {
-          return false;
-        }
-      }
-      break;
-
-    default:
-      return false;
-  }
-  return true;
-};
+const getAll = async () => Request.findAll({
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
 const update = async (id, body) => {
   const {
@@ -183,6 +148,8 @@ module.exports = {
   create,
   get,
   getAll,
+  getActiveRequestByUser,
+  getRequestRecordByUser,
   update,
   remove,
   getByUser,
