@@ -56,12 +56,12 @@ const get = async (req, res) => {
 };
 
 const getByAux = async (req, res) => {
-  const idToken = req.get('idToken');
-  const authAssistant = await authorization.requiresAssistant(idToken);
-  const authAdmin = await authorization.requiresAdmin(idToken);
+  // const idToken = req.get('idToken');
+  // const authAssistant = await authorization.requiresAssistant(idToken);
+  // const authAdmin = await authorization.requiresAdmin(idToken);
 
-  // If the event is not created by admin nor an assistant, the request must be rejected
-  if (!authAssistant && !authAdmin) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+  // // If the event is not created by admin nor an assistant, the request must be rejected
+  // if (!authAssistant && !authAdmin) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   const { params } = req;
 

@@ -1,9 +1,19 @@
-const config = require('./config');
+const { checkState } = require('./config');
 const db = require('../../../../../config/database');
 
 let Event = require('../../models/event');
+let EventState = require('../../models/event_state');
+let EventType = require('../../models/event_type');
 
 Event = Event(db.sequelize, db.Sequelize);
+EventState = EventState(db.sequelize, db.Sequelize);
+EventType = EventType(db.sequelize, db.Sequelize);
+
+EventState.hasMany(Event, { foreignKey: 'stateID' });
+Event.belongsTo(EventState, { foreignKey: 'stateID' });
+
+EventType.hasMany(Event, { foreignKey: 'eventType' });
+Event.belongsTo(EventType, { foreignKey: 'eventType' });
 
 const create = async (params, body) => {
   let {
@@ -27,6 +37,11 @@ const create = async (params, body) => {
 const get = async (id) => {
   const data = await Event.findAll({
     where: { id },
+    include: [
+      { model: EventState },
+      { model: EventType },
+    ],
+    order: [['startTime', 'ASC']],
   });
   return data[0];
 };
@@ -36,30 +51,21 @@ const getByRoom = async (params) => {
 
   return Event.findAll({
     where: { sectionalID, blockID, roomID },
+    include: [
+      { model: EventState },
+      { model: EventType },
+    ],
+    order: [['startTime', 'ASC']],
   });
 };
 
-const getAll = async () => Event.findAll();
-
-const checkState = (actualState, newState) => {
-  // If the actual state is 'confirmed', it just can change to 'canceled' or 'in course'
-  if (actualState === config.CONFIRMED) {
-    if (newState === 4) {
-      return false;
-    }
-  }
-
-  if (actualState === config.CANCELED || actualState === config.DONE) {
-    return false;
-  }
-
-  if (actualState === config.IN_COURSE) {
-    if (newState !== config.DONE) {
-      return false;
-    }
-  }
-  return true;
-};
+const getAll = async () => Event.findAll({
+  include: [
+    { model: EventState },
+    { model: EventType },
+  ],
+  order: [['startTime', 'ASC']],
+});
 
 const update = async (params, body) => {
   const {
