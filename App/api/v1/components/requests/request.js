@@ -117,7 +117,6 @@ const getAll = async () => Request.findAll({
 
 const update = async (id, body) => {
   const {
-    requestType,
     description,
     stateID,
     createdBy,
@@ -130,12 +129,12 @@ const update = async (id, body) => {
   } = body;
 
   const updateArgs = {
-    requestType, description, createdBy, sectionalID, blockID, roomID, eventID, startTime, endTime,
+    description, createdBy, sectionalID, blockID, roomID, eventID, startTime, endTime,
   };
 
   if (stateID) {
     const request = await get(id);
-    const actualState = request.stateID;
+    const { actualState, requestType } = request;
 
     if (checkState(requestType, actualState, stateID)) {
       updateArgs.stateID = stateID;
