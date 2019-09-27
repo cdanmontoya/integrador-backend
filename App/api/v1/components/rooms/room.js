@@ -38,8 +38,6 @@ const getByBlock = async (sectionalID, blockID) => Room.findAll({
 const getAll = async () => Room.findAll();
 
 const getAvailableRooms = async (startTime, endTime) => {
-  console.log(startTime);
-
   const newStartTime = new Date(startTime);
   const newEndTime = new Date(endTime);
 

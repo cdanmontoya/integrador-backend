@@ -10,11 +10,9 @@ const create = async (req, res) => {
   const { body } = req;
 
   await util.create(body).then(
-    (request) => {
-      return res
-        .status(httpStatus.CREATED)
-        .send({ message: 'Created', request });
-    },
+    (request) => res
+      .status(httpStatus.CREATED)
+      .send({ message: 'Created', request }),
     (err) => {
       console.error(err);
       return res
@@ -140,7 +138,6 @@ const getRequestRecordByUser = async (req, res) => {
 
 const getByUserSwitcher = async (req, res) => {
   const { active } = req.query;
-  console.log(active)
 
   switch (active) {
     case 'true':
@@ -148,7 +145,6 @@ const getByUserSwitcher = async (req, res) => {
       break;
 
     case 'false':
-      console.log('jeje, trying to get record')
       await getRequestRecordByUser(req, res);
       break;
 

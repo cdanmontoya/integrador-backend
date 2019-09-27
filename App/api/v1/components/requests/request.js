@@ -8,13 +8,16 @@ const { Op } = db.Sequelize;
 let Request = require('../../models/request');
 let RequestType = require('../../models/request_type');
 let ItemsPerRequest = require('../../models/items_per_request');
+let RequestState = require('../../models/request_state');
 
 Request = Request(db.sequelize, db.Sequelize);
 RequestType = RequestType(db.sequelize, db.Sequelize);
 ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
-
+RequestState = RequestState(db.sequelize, db.Sequelize);
 
 RequestType.hasMany(Request, { foreignKey: 'requestType' });
+RequestState.hasMany(Request, { foreignKey: 'stateID' });
+Request.belongsTo(RequestState, { foreignKey: 'stateID' });
 Request.belongsTo(RequestType, { foreignKey: 'requestType' });
 Request.hasMany(ItemsPerRequest, { foreignKey: 'requestID' });
 ItemsPerRequest.belongsTo(Request, { foreignKey: 'requestID' });
@@ -56,6 +59,7 @@ const get = async (id) => {
     include: [
       { model: RequestType },
       { model: ItemsPerRequest },
+      { model: RequestState },
     ],
     order: [['startTime', 'DESC']],
   });
@@ -67,6 +71,7 @@ const getByUser = async (username) => Request.findAll({
   include: [
     { model: RequestType },
     { model: ItemsPerRequest },
+    { model: RequestState },
   ],
   order: [['startTime', 'DESC']],
 });
@@ -81,6 +86,7 @@ const getActiveRequestByUser = async (username) => Request.findAll({
   include: [
     { model: RequestType },
     { model: ItemsPerRequest },
+    { model: RequestState },
   ],
   order: [['startTime', 'DESC']],
 });
@@ -95,6 +101,7 @@ const getRequestRecordByUser = async (username) => Request.findAll({
   include: [
     { model: RequestType },
     { model: ItemsPerRequest },
+    { model: RequestState },
   ],
   order: [['startTime', 'DESC']],
 });
@@ -103,6 +110,7 @@ const getAll = async () => Request.findAll({
   include: [
     { model: RequestType },
     { model: ItemsPerRequest },
+    { model: RequestState },
   ],
   order: [['startTime', 'DESC']],
 });

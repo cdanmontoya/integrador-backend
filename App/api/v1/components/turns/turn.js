@@ -3,10 +3,14 @@ const db = require('../../../../../config/database');
 
 let Turn = require('../../models/turn');
 let Section = require('../../models/section');
+let TurnState = require('../../models/turn_state');
 
 Turn = Turn(db.sequelize, db.Sequelize);
 Section = Section(db.sequelize, db.Sequelize);
+TurnState = TurnState(db.sequelize, db.Sequelize);
 
+TurnState.hasMany(Turn, { foreignKey: 'stateID' });
+Turn.belongsTo(TurnState, { foreignKey: 'stateID' });
 Section.hasMany(Turn, { foreignKey: 'sectionID' });
 Turn.belongsTo(Section, { foreignKey: 'sectionID' });
 
@@ -27,6 +31,10 @@ const create = async (params, body) => {
 const get = async (id) => {
   const data = await Turn.findAll({
     where: { id },
+    include: [
+      { model: TurnState },
+    ],
+    order: [['startTime', 'ASC']],
   });
   return data[0];
 };
@@ -36,6 +44,10 @@ const getByAux = async (params) => {
 
   return Turn.findAll({
     where: { auxiliarID: username },
+    include: [
+      { model: TurnState },
+    ],
+    order: [['startTime', 'ASC']],
   });
 };
 
