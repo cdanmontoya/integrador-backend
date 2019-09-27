@@ -18,7 +18,6 @@ const checkState = (requestType, actualState, newState) => {
     || actualState === states.DONE) {
     return false;
   }
-
   switch (requestType) {
     case types.RESERVE:
       if (actualState === states.PENDING) {
