@@ -80,6 +80,41 @@ const getByLogisticUnit = async (req, res) => {
   return true;
 };
 
+const getRoomsWithoutSection = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+  await util.getRoomsWithoutSection(req.params).then(
+    (data) => {
+      if (data.length > 0) {
+        return res
+          .status(httpStatus.OK)
+          .send(data);
+      }
+      return res
+        .status(httpStatus.NO_CONTENT)
+        .send({ message: 'No data found' });
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
+    },
+  );
+  return true;
+};
+
+const getRoomsSwitcher = async (req, res) => {
+  const { supervised } = req.query;
+
+  if (supervised === 'false') {
+    await getRoomsWithoutSection(req, res);
+  } else {
+    await getByLogisticUnit(req, res);
+  }
+};
+
 const getAll = async (req, res) => {
   const idToken = req.get('idToken');
   const auth = await authorization.requiresLogin(idToken);
@@ -181,6 +216,7 @@ module.exports = {
   create,
   get,
   getByLogisticUnit,
+  getRoomsSwitcher,
   getAll,
   update,
   remove,
