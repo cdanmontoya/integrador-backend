@@ -1,12 +1,7 @@
 const httpStatus = require('http-status');
 const util = require('./item');
-const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
 
   await util.create(body).then(
@@ -20,14 +15,9 @@ const create = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const get = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { itemID } = req.params;
 
   await util.get(itemID).then(
@@ -48,14 +38,9 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getAll = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -74,7 +59,6 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const getTypes = async (req, res) => {
@@ -140,13 +124,6 @@ const getTypesSwitcher = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const idToken = req.get('idToken');
-  const authAssistant = await authorization.requiresAssistant(idToken);
-  const authAdmin = await authorization.requiresAdmin(idToken);
-
-  // If the event is not created by admin nor an assistant, the request must be rejected
-  if (!authAssistant && !authAdmin) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
   const { itemID } = req.params;
 
@@ -161,14 +138,9 @@ const update = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
-  return true;
 };
 
 const remove = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { itemID } = req.params;
 
   await util
@@ -190,7 +162,23 @@ const remove = async (req, res) => {
         .status(httpStatus.INTERNAL_SERVER_ERROR)
         .send({ message: 'Error' });
     });
-  return true;
+};
+
+const changeState = async (req, res) => {
+  const { params } = req;
+  const { body } = req;
+
+  await util
+    .changeState(params, body)
+    .then(() => res
+      .status(httpStatus.OK)
+      .send({ message: 'Updated' }))
+    .catch((err) => {
+      console.log(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error', err });
+    });
 };
 
 module.exports = {
@@ -200,4 +188,5 @@ module.exports = {
   getAll,
   update,
   remove,
+  changeState,
 };

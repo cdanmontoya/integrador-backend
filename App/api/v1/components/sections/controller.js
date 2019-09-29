@@ -1,6 +1,5 @@
 const httpStatus = require('http-status');
 const util = require('./section');
-const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
   const idToken = req.get('idToken');
@@ -21,14 +20,9 @@ const create = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const get = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const id = req.params.sectionID;
 
   await util.get(id).then(
@@ -49,14 +43,9 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getByLogisticUnit = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { params } = req;
 
   await util.getByLogisticUnit(params).then(
@@ -77,7 +66,6 @@ const getByLogisticUnit = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 const getRoomsWithoutSection = async (req, res) => {
@@ -116,10 +104,6 @@ const getRoomsSwitcher = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -138,14 +122,9 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const update = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
   const { params } = req;
 
@@ -175,10 +154,6 @@ const update = async (req, res) => {
 
 
 const remove = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresSystemAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { params } = req;
 
   const { sectionID } = params;

@@ -1,12 +1,7 @@
 const httpStatus = require('http-status');
 const util = require('./request');
-const authorization = require('../../../../services/authorization/authorization');
 
 const create = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
 
   await util.create(body).then(
@@ -20,14 +15,9 @@ const create = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const get = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { requestID } = req.params;
 
   await util.get(requestID).then(
@@ -48,7 +38,6 @@ const get = async (req, res) => {
         .send({ message: 'Internal server error' });
     },
   );
-  return true;
 };
 
 
@@ -155,10 +144,6 @@ const getByUserSwitcher = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   await util.getAll().then(
     (data) => {
       if (data.length > 0) {
@@ -177,14 +162,9 @@ const getAll = async (req, res) => {
         .send({ message: 'Error' });
     },
   );
-  return true;
 };
 
 const update = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { body } = req;
   const { requestID } = req.params;
 
@@ -208,10 +188,6 @@ const update = async (req, res) => {
 };
 
 const remove = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresAdmin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
-
   const { requestID } = req.params;
 
   const request = await util.get(requestID);

@@ -58,8 +58,6 @@ const remove = async (username) => {
   });
 };
 
-const getAssistants = async (logisticUnit) => User.findAll({ where: { logisticUnit } });
-
 const isAdmin = async (username) => {
   const user = await get(username);
   if (!user) {
@@ -76,23 +74,12 @@ const isAssistant = async (username) => {
   return user.userType === config.ASSISTANT;
 };
 
-const isSystemAdmin = async (username) => {
-  const user = await get(username);
-  if (!user) {
-    return false;
-  }
-  return user.userType === config.SYSTEM_ADMIN;
-};
-
-
 module.exports = {
   create,
   get,
   getAll,
-  getAssistants,
   update,
   remove,
   isAdmin,
   isAssistant,
-  isSystemAdmin,
 };
