@@ -31,7 +31,6 @@ const remove = async (id) => {
   });
 };
 
-
 module.exports = {
   create,
   get,
