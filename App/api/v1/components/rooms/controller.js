@@ -80,9 +80,9 @@ const get = async (req, res) => {
 };
 
 const getByBlock = async (req, res) => {
-  const idToken = req.get('idToken');
-  const auth = await authorization.requiresLogin(idToken);
-  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+  // const idToken = req.get('idToken');
+  // const auth = await authorization.requiresLogin(idToken);
+  // if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
 
   const sectional = req.params.sectionalID;
   const block = req.params.blockID;

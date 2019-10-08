@@ -1,7 +1,12 @@
 const db = require('../../../../../config/database');
 let Room = require('../../models/room');
+let Sectional = require('../../models/sectional');
 
+Sectional = Sectional(db.sequelize, db.Sequelize);
 Room = Room(db.sequelize, db.Sequelize);
+
+Sectional.hasMany(Room, { foreignKey: 'sectionalID' });
+Room.belongsTo(Sectional, { foreignKey: 'sectionalID' });
 
 const create = async (sectionalID, blockID, body) => {
   const { id, capacity, type } = body;
@@ -26,6 +31,9 @@ const createMany = async (sectionalID, blockID, body) => {
 const get = async (sectionalID, blockID, id) => {
   const data = await Room.findAll({
     where: { sectionalID, blockID, id },
+    include: [
+      { model: Sectional }
+    ],
   });
 
   return data[0];
@@ -33,9 +41,16 @@ const get = async (sectionalID, blockID, id) => {
 
 const getByBlock = async (sectionalID, blockID) => Room.findAll({
   where: { sectionalID, blockID },
+  include: [
+    { model: Sectional }
+  ],
 });
 
-const getAll = async () => Room.findAll();
+const getAll = async () => Room.findAll({
+  include: [
+    { model: Sectional }
+  ],
+});
 
 const getAvailableRooms = async (startTime, endTime) => {
   const newStartTime = new Date(startTime);
