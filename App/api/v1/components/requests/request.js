@@ -9,17 +9,21 @@ let Request = require('../../models/request');
 let RequestType = require('../../models/request_type');
 let ItemsPerRequest = require('../../models/items_per_request');
 let RequestState = require('../../models/request_state');
+let Room = require('../../models/room');
 
 Request = Request(db.sequelize, db.Sequelize);
 RequestType = RequestType(db.sequelize, db.Sequelize);
 ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
 RequestState = RequestState(db.sequelize, db.Sequelize);
+Room = Room(db.sequelize, db.Sequelize);
 
 RequestType.hasMany(Request, { foreignKey: 'requestType' });
 RequestState.hasMany(Request, { foreignKey: 'stateID' });
 Request.belongsTo(RequestState, { foreignKey: 'stateID' });
 Request.belongsTo(RequestType, { foreignKey: 'requestType' });
 Request.hasMany(ItemsPerRequest, { foreignKey: 'requestID' });
+
+// Request.hasOne(Room, { foreignKey: 'roomID' });
 ItemsPerRequest.belongsTo(Request, { foreignKey: 'requestID' });
 
 const create = async (body) => {
@@ -106,6 +110,19 @@ const getRequestRecordByUser = async (username) => Request.findAll({
   order: [['startTime', 'DESC']],
 });
 
+const getRoomsActiveRequests = async () => Request.findAll({
+  where: {
+    requestType: 1,
+    stateID: 1,
+  },
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+    { model: RequestState },
+  ],
+  order: [['startTime', 'DESC']],
+});
+
 const getAll = async () => Request.findAll({
   include: [
     { model: RequestType },
@@ -157,6 +174,7 @@ module.exports = {
   getAll,
   getActiveRequestByUser,
   getRequestRecordByUser,
+  getRoomsActiveRequests,
   update,
   remove,
   getByUser,

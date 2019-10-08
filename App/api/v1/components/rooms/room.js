@@ -32,7 +32,7 @@ const get = async (sectionalID, blockID, id) => {
   const data = await Room.findAll({
     where: { sectionalID, blockID, id },
     include: [
-      { model: Sectional }
+      { model: Sectional },
     ],
   });
 
@@ -42,13 +42,13 @@ const get = async (sectionalID, blockID, id) => {
 const getByBlock = async (sectionalID, blockID) => Room.findAll({
   where: { sectionalID, blockID },
   include: [
-    { model: Sectional }
+    { model: Sectional },
   ],
 });
 
 const getAll = async () => Room.findAll({
   include: [
-    { model: Sectional }
+    { model: Sectional },
   ],
 });
 
