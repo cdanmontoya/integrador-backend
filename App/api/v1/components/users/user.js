@@ -33,6 +33,9 @@ const get = async (username) => {
   return data[0];
 };
 
+
+const getUsers = async () => User.findAll({ where: { userType: 3 } });
+
 const getAll = async () => User.findAll({
   include: [
     { model: UserType },
@@ -58,7 +61,9 @@ const remove = async (username) => {
   });
 };
 
-const getAssistants = async (logisticUnit) => User.findAll({ where: { logisticUnit } });
+const getAssistants = async (logisticUnit) => User.findAll({
+  where: { logisticUnit, userType: 2 },
+});
 
 const isAdmin = async (username) => {
   const user = await get(username);
@@ -89,6 +94,7 @@ module.exports = {
   create,
   get,
   getAll,
+  getUsers,
   getAssistants,
   update,
   remove,

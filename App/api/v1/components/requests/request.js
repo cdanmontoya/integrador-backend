@@ -14,12 +14,13 @@ Request = Request(db.sequelize, db.Sequelize);
 RequestType = RequestType(db.sequelize, db.Sequelize);
 ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
 RequestState = RequestState(db.sequelize, db.Sequelize);
-
 RequestType.hasMany(Request, { foreignKey: 'requestType' });
 RequestState.hasMany(Request, { foreignKey: 'stateID' });
 Request.belongsTo(RequestState, { foreignKey: 'stateID' });
 Request.belongsTo(RequestType, { foreignKey: 'requestType' });
 Request.hasMany(ItemsPerRequest, { foreignKey: 'requestID' });
+
+// Request.hasOne(Room, { foreignKey: 'roomID' });
 ItemsPerRequest.belongsTo(Request, { foreignKey: 'requestID' });
 
 const create = async (body) => {
@@ -106,6 +107,18 @@ const getRequestRecordByUser = async (username) => Request.findAll({
   order: [['startTime', 'DESC']],
 });
 
+const getRoomsActiveRequests = async (username) => {
+  const query = `SELECT * FROM integrador.Request r INNER JOIN integrador.Rooms_per_Logistic_Unit rpl
+  ON r.roomID=rpl.roomID AND r.blockID=rpl.blockID AND r.sectionalID=rpl.sectionalID 
+  AND rpl.logisticUnit='${username}' AND r.requestType=r.stateID AND r.requestType=1;`;
+
+  let data = await db.sequelize.query(query);
+  data = JSON.parse(JSON.stringify(data[0]));
+
+  return data;
+};
+
+
 const getAll = async () => Request.findAll({
   include: [
     { model: RequestType },
@@ -157,6 +170,7 @@ module.exports = {
   getAll,
   getActiveRequestByUser,
   getRequestRecordByUser,
+  getRoomsActiveRequests,
   update,
   remove,
   getByUser,

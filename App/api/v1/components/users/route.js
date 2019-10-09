@@ -6,7 +6,7 @@ const controller = require('./controller');
 
 router.route('/')
   .post((req, res) => controller.create(req, res))
-  .get((req, res) => controller.getAll(req, res));
+  .get((req, res) => controller.getAllSwitcher(req, res));
 
 router.route('/:username')
   .get((req, res) => controller.get(req, res))
