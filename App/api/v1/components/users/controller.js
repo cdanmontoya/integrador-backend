@@ -73,6 +73,43 @@ const getAll = async (req, res) => {
   return true;
 };
 
+const getUsers = async (req, res) => {
+  const idToken = req.get('idToken');
+  const auth = await authorization.requiresLogin(idToken);
+  if (!auth) return res.status(httpStatus.UNAUTHORIZED).send({ error: 'You are not allowed to see this content' });
+
+  await util.getUsers().then(
+    (data) => {
+      if (data.length > 0) {
+        return res
+          .status(httpStatus.OK)
+          .send(data);
+      }
+      return res
+        .status(httpStatus.NO_CONTENT)
+        .send({ message: 'No data found' });
+    },
+    (err) => {
+      console.error(err);
+      return res
+        .status(httpStatus.INTERNAL_SERVER_ERROR)
+        .send({ message: 'Error' });
+    },
+  );
+  return true;
+};
+
+const getAllSwitcher = async (req, res) => {
+  const { userType } = req.query;
+
+  if (userType === '3') {
+    await getUsers(req, res);
+  } else {
+    // await getAll(req, res);
+    // return;
+  }
+};
+
 const update = async (req, res) => {
   const { body } = req;
   const { username } = req.params;
@@ -163,6 +200,7 @@ module.exports = {
   create,
   get,
   getAll,
+  getAllSwitcher,
   update,
   remove,
   getAssistants,

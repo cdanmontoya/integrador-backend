@@ -9,14 +9,11 @@ let Request = require('../../models/request');
 let RequestType = require('../../models/request_type');
 let ItemsPerRequest = require('../../models/items_per_request');
 let RequestState = require('../../models/request_state');
-let Room = require('../../models/room');
 
 Request = Request(db.sequelize, db.Sequelize);
 RequestType = RequestType(db.sequelize, db.Sequelize);
 ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
 RequestState = RequestState(db.sequelize, db.Sequelize);
-Room = Room(db.sequelize, db.Sequelize);
-
 RequestType.hasMany(Request, { foreignKey: 'requestType' });
 RequestState.hasMany(Request, { foreignKey: 'stateID' });
 Request.belongsTo(RequestState, { foreignKey: 'stateID' });
@@ -110,18 +107,17 @@ const getRequestRecordByUser = async (username) => Request.findAll({
   order: [['startTime', 'DESC']],
 });
 
-const getRoomsActiveRequests = async () => Request.findAll({
-  where: {
-    requestType: 1,
-    stateID: 1,
-  },
-  include: [
-    { model: RequestType },
-    { model: ItemsPerRequest },
-    { model: RequestState },
-  ],
-  order: [['startTime', 'DESC']],
-});
+const getRoomsActiveRequests = async (username) => {
+  const query = `SELECT * FROM integrador.Request r INNER JOIN integrador.Rooms_per_Logistic_Unit rpl
+  ON r.roomID=rpl.roomID AND r.blockID=rpl.blockID AND r.sectionalID=rpl.sectionalID 
+  AND rpl.logisticUnit='${username}' AND r.requestType=r.stateID AND r.requestType=1;`;
+
+  let data = await db.sequelize.query(query);
+  data = JSON.parse(JSON.stringify(data[0]));
+
+  return data;
+};
+
 
 const getAll = async () => Request.findAll({
   include: [
