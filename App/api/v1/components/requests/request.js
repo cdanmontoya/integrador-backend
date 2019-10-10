@@ -108,7 +108,7 @@ const getRequestRecordByUser = async (username) => Request.findAll({
 });
 
 const getRoomsActiveRequests = async (username) => {
-  const query = `SELECT * FROM integrador.Request r INNER JOIN integrador.Rooms_per_Logistic_Unit rpl
+  const query = `SELECT r.id as requestID, r.requestType, r.description, r.stateID, r.createdBy, r.createdAt, r.sectionalID, r.blockID, r.roomID, r.eventID, r.startTime, r.endTime, rpl.logisticUnit FROM integrador.Request r INNER JOIN integrador.Rooms_per_Logistic_Unit rpl
   ON r.roomID=rpl.roomID AND r.blockID=rpl.blockID AND r.sectionalID=rpl.sectionalID 
   AND rpl.logisticUnit='${username}' AND r.requestType=r.stateID AND r.requestType=1;`;
 
