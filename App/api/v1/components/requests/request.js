@@ -1,11 +1,28 @@
-const config = require('./config');
+const { checkState } = require('./config');
 const db = require('../../../../../config/database');
+const itemsPerRequest = require('../items-per-request/itemsPerRequest');
+const RequestRecord = require('./request-record');
+const Event = require('../events/event');
+
+const { Op } = db.Sequelize;
 
 let Request = require('../../models/request');
+let RequestType = require('../../models/request_type');
+let ItemsPerRequest = require('../../models/items_per_request');
+let RequestState = require('../../models/request_state');
 
 Request = Request(db.sequelize, db.Sequelize);
+RequestType = RequestType(db.sequelize, db.Sequelize);
+ItemsPerRequest = ItemsPerRequest(db.sequelize, db.Sequelize);
+RequestState = RequestState(db.sequelize, db.Sequelize);
+RequestType.hasMany(Request, { foreignKey: 'requestType' });
+RequestState.hasMany(Request, { foreignKey: 'stateID' });
+Request.belongsTo(RequestState, { foreignKey: 'stateID' });
+Request.belongsTo(RequestType, { foreignKey: 'requestType' });
+Request.hasMany(ItemsPerRequest, { foreignKey: 'requestID' });
 
-const itemsPerRequest = require('../items-per-request/itemsPerRequest');
+// Request.hasOne(Room, { foreignKey: 'roomID' });
+ItemsPerRequest.belongsTo(Request, { foreignKey: 'requestID' });
 
 const create = async (body) => {
   let {
@@ -31,87 +48,89 @@ const create = async (body) => {
     roomID,
     startTime,
     endTime,
-  }).then((request) => {
+  }).then(async (request) => {
     const requestID = request.dataValues.id;
-    itemsPerRequest.createMany(requestID, items);
+    await itemsPerRequest.createMany(requestID, items);
+    await RequestRecord.onUpdate(requestID, 'Created', createdBy, 1);
   });
 };
 
 const get = async (id) => {
-  const data = await Request.findAll({ where: { id } });
+  const data = await Request.findAll({
+    where: { id },
+    include: [
+      { model: RequestType },
+      { model: ItemsPerRequest },
+      { model: RequestState },
+    ],
+    order: [['startTime', 'DESC']],
+  });
   return data[0];
 };
 
-const getAll = async () => Request.findAll();
+const getByUser = async (username) => Request.findAll({
+  where: { createdBy: username },
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+    { model: RequestState },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
-const checkState = (requestType, actualState, newState) => {
-  if (actualState === config.states.CANCELED || actualState === config.states.REJECTED
-    || actualState === config.states.DONE) {
-    return false;
-  }
+const getActiveRequestByUser = async (username) => Request.findAll({
+  where: {
+    createdBy: username,
+    stateID: {
+      [Op.or]: [1, 4, 5],
+    },
+  },
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+    { model: RequestState },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
-  switch (requestType) {
-    case config.types.RESERVE:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return true;
-        }
-        return false;
-      }
+const getRequestRecordByUser = async (username) => Request.findAll({
+  where: {
+    createdBy: username,
+    stateID: {
+      [Op.or]: [2, 3, 6],
+    },
+  },
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+    { model: RequestState },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
-      if (actualState === config.states.APPROVED) {
-        if (newState !== config.states.CANCELED) {
-          return false;
-        }
-      }
-      break;
+const getRoomsActiveRequests = async (username) => {
+  const query = `SELECT r.id as requestID, r.requestType, r.description, r.stateID, r.createdBy, r.createdAt, r.sectionalID, r.blockID, r.roomID, r.eventID, r.startTime, r.endTime, rpl.logisticUnit FROM integrador.Request r INNER JOIN integrador.Rooms_per_Logistic_Unit rpl
+  ON r.roomID=rpl.roomID AND r.blockID=rpl.blockID AND r.sectionalID=rpl.sectionalID 
+  AND rpl.logisticUnit='${username}' AND r.requestType=r.stateID AND r.requestType=1;`;
 
-    case config.types.ASSISTANCE:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.IN_COURSE && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return false;
-        }
-      }
+  let data = await db.sequelize.query(query);
+  data = JSON.parse(JSON.stringify(data[0]));
 
-      if (actualState === config.states.IN_COURSE) {
-        if (newState !== config.states.DONE) {
-          return false;
-        }
-      }
-      break;
-
-    case config.types.LOAN:
-      if (actualState === config.states.PENDING) {
-        if (newState !== config.types.APPROVED && newState !== config.types.REJECTED
-          && newState !== config.types.CANCELED) {
-          return false;
-        }
-      }
-
-      if (actualState === config.states.APPROVED) {
-        if (newState !== config.states.IN_COURSE) {
-          return false;
-        }
-      }
-
-      if (actualState === config.types.IN_COURSE) {
-        if (newState !== config.types.DONE) {
-          return false;
-        }
-      }
-      break;
-
-    default:
-      return false;
-  }
-  return true;
+  return data;
 };
+
+
+const getAll = async () => Request.findAll({
+  include: [
+    { model: RequestType },
+    { model: ItemsPerRequest },
+    { model: RequestState },
+  ],
+  order: [['startTime', 'DESC']],
+});
 
 const update = async (id, body) => {
   const {
-    requestType,
     description,
     stateID,
     createdBy,
@@ -124,15 +143,35 @@ const update = async (id, body) => {
   } = body;
 
   const updateArgs = {
-    requestType, description, createdBy, sectionalID, blockID, roomID, eventID, startTime, endTime,
+    description, createdBy, sectionalID, blockID, roomID, eventID, startTime, endTime,
   };
 
   if (stateID) {
     const request = await get(id);
-    const actualState = request.stateID;
+    const { actualState, requestType } = request;
 
     if (checkState(requestType, actualState, stateID)) {
       updateArgs.stateID = stateID;
+    }
+
+    if (requestType === 1 && stateID === 4) {
+      const eventParams = {
+        sectionalID: request.sectionalID,
+        blockID: request.blockID,
+        roomID: request.roomID,
+      };
+
+      const eventBody = {
+        name: request.description,
+        eventType: 1,
+        stateID: 1,
+        description: request.description,
+        userID: request.createdBy,
+        startTime: request.startTime,
+        endTime: request.endTime,
+      };
+
+      Event.create(eventParams, eventBody);
     }
   }
 
@@ -150,6 +189,10 @@ module.exports = {
   create,
   get,
   getAll,
+  getActiveRequestByUser,
+  getRequestRecordByUser,
+  getRoomsActiveRequests,
   update,
   remove,
+  getByUser,
 };

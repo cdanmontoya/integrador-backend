@@ -2,8 +2,10 @@ const config = require('./config');
 const db = require('../../../../../config/database');
 
 let Item = require('../../models/item');
+let ItemTypes = require('../../models/item_type');
 
 Item = Item(db.sequelize, db.Sequelize);
+ItemTypes = ItemTypes(db.sequelize, db.Sequelize);
 
 const create = async (body) => {
   const { name, typeID, statusID } = body;
@@ -20,6 +22,20 @@ const get = async (id) => {
     where: { id },
   });
   return data[0];
+};
+
+const getTypes = async () => ItemTypes.findAll();
+
+const getFormatedTypes = async () => {
+  const data = await getTypes();
+  const response = { itemTypes: [] };
+
+  data.forEach((element) => {
+    const formatedDescription = `${element.id}. ${element.description}`;
+    response.itemTypes.push(formatedDescription);
+  });
+
+  return response;
 };
 
 const getAll = async () => Item.findAll();
@@ -69,6 +85,8 @@ const remove = async (id) => {
 module.exports = {
   create,
   get,
+  getTypes,
+  getFormatedTypes,
   getAll,
   update,
   remove,

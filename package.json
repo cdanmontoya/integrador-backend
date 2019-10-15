@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint ./ --fix",
     "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "coverage": "jest --coverage && ./node_modules/.bin/codecov -t 25c7d18c-cae9-4391-b4af-36b888933355"
   },
   "repository": {
     "type": "git",
@@ -26,20 +27,28 @@
   "homepage": "https://github.com/cdanmontoya/integrador-backend#readme",
   "devDependencies": {
     "@types/express": "^4.17.0",
+    "@types/firebase": "^3.2.1",
+    "@types/jest": "^24.0.18",
     "@types/sequelize": "^4.28.4",
     "eslint": "^6.1.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^22.17.0",
     "eslint-plugin-security": "^1.4.0",
+    "jest": "^24.9.0",
     "nodemon": "^1.19.1"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
+    "codecov": "^3.5.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "firebase-admin": "^8.4.0",
+    "google-auth-library": "^5.2.0",
     "http-status": "^1.3.2",
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
-    "sequelize": "^5.10.1"
+    "sequelize": "^5.10.1",
+    "should": "^13.2.3"
   }
 }
