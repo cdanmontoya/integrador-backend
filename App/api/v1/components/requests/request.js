@@ -2,6 +2,7 @@ const { checkState } = require('./config');
 const db = require('../../../../../config/database');
 const itemsPerRequest = require('../items-per-request/itemsPerRequest');
 const RequestRecord = require('./request-record');
+const Event = require('../events/event');
 
 const { Op } = db.Sequelize;
 
@@ -151,6 +152,26 @@ const update = async (id, body) => {
 
     if (checkState(requestType, actualState, stateID)) {
       updateArgs.stateID = stateID;
+    }
+
+    if (requestType === 1 && stateID === 4) {
+      const eventParams = {
+        sectionalID: request.sectionalID,
+        blockID: request.blockID,
+        roomID: request.roomID,
+      };
+
+      const eventBody = {
+        name: request.description,
+        eventType: 1,
+        stateID: 1,
+        description: request.description,
+        userID: request.createdBy,
+        startTime: request.startTime,
+        endTime: request.endTime,
+      };
+
+      Event.create(eventParams, eventBody);
     }
   }
 
